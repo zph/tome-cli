@@ -123,7 +123,8 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		TOME_ROOT_DIR := os.Getenv("TOME_ROOT_DIR")
+		config := NewConfig()
+		rootDir := config.RootDir()
 		if len(args) == 0 {
 			allExecutables := []string{}
 			fn := func(path string, info fs.FileInfo, err error) error {
@@ -138,18 +139,18 @@ to quickly create a Cobra application.`,
 				}
 				return nil
 			}
-			err := filepath.Walk(TOME_ROOT_DIR, fn)
+			err := filepath.Walk(rootDir, fn)
 			if err != nil {
 				return err
 			}
 			for _, executable := range allExecutables {
-				s := NewScript(executable, TOME_ROOT_DIR)
+				s := NewScript(executable, rootDir)
 				s.PrintUsage()
 			}
 		} else {
-			rootWithArgs := append([]string{TOME_ROOT_DIR}, args...)
+			rootWithArgs := append([]string{rootDir}, args...)
 			filePath := path.Join(rootWithArgs...)
-			s := NewScript(filePath, TOME_ROOT_DIR)
+			s := NewScript(filePath, rootDir)
 			s.PrintHelp()
 		}
 		return nil
@@ -159,14 +160,4 @@ to quickly create a Cobra application.`,
 
 func init() {
 	rootCmd.AddCommand(helpCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// helpCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// helpCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

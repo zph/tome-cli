@@ -14,11 +14,8 @@ import (
 )
 
 func ValidArgsFunctionForScripts(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	rootDir, ok := os.LookupEnv("TOME_ROOT_DIR")
-	if !ok {
-		fmt.Println("TOME_ROOT_DIR not set")
-		os.Exit(1)
-	}
+	config := NewConfig()
+	rootDir := config.RootDir()
 
 	fullPathSegments := append([]string{rootDir}, args...)
 	fullPath := path.Join(fullPathSegments...)
@@ -80,6 +77,8 @@ func ValidArgsFunctionForScripts(cmd *cobra.Command, args []string, toComplete s
 }
 
 func ExecRunE(cmd *cobra.Command, args []string) error {
+	config := NewConfig()
+	rootDir := config.RootDir()
 	if len(args) == 0 {
 		fmt.Println("No file specified")
 		os.Exit(1)
@@ -90,13 +89,15 @@ func ExecRunE(cmd *cobra.Command, args []string) error {
 	var executable string
 	var maybeArgs []string
 	for idx, arg := range args {
-
-		rootDir, ok := os.LookupEnv("TOME_ROOT_DIR")
-		if !ok {
-			fmt.Println("TOME_ROOT_DIR not set")
-			os.Exit(1)
+		// Guard against first cycle through where maybeFile is empty
+		// but on subsequent cycles, we want to not double stack the root dir
+		var fileRoot string
+		if maybeFile == "" {
+			fileRoot = rootDir
+		} else {
+			fileRoot = maybeFile
 		}
-		maybeFile = path.Join(rootDir, maybeFile, arg)
+		maybeFile = path.Join(fileRoot, arg)
 		maybeArgs = args[idx+1:]
 		fileInfo, err := os.Stat(maybeFile)
 		if os.IsNotExist(err) {
@@ -150,14 +151,4 @@ to quickly create a Cobra application.`,
 
 func init() {
 	rootCmd.AddCommand(execCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// execCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// execCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
