@@ -19,8 +19,6 @@ var rootDir string
 var executableName string
 
 var (
-	defaultConfigFilename      = ".tome-cli"
-	envPrefix                  = "TOME_CLI"
 	replaceHyphenWithCamelCase = false
 )
 

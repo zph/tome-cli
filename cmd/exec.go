@@ -28,7 +28,6 @@ func ValidArgsFunctionForScripts(cmd *cobra.Command, args []string, toComplete s
 		return nil, cobra.ShellCompDirectiveNoFileComp
 	}
 
-	// TODO: determine how to auto-complete flags for dynamic subcommands
 	// TODO: how do we do completions for arbitrary binary name? right now it uses tome-cli
 	var toCompleteEntries []string
 	if toComplete == "" {
