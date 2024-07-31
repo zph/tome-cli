@@ -79,6 +79,61 @@ func ValidArgsFunctionForScripts(cmd *cobra.Command, args []string, toComplete s
 	return executableOrDirectories, cobra.ShellCompDirectiveNoFileComp
 }
 
+func ExecRunE(cmd *cobra.Command, args []string) error {
+	if len(args) == 0 {
+		fmt.Println("No file specified")
+		os.Exit(1)
+	}
+
+	// Try joining one arg segment at a time and return the first one that exists and is executable
+	var maybeFile string
+	var executable string
+	var maybeArgs []string
+	for idx, arg := range args {
+
+		rootDir, ok := os.LookupEnv("TOME_ROOT_DIR")
+		if !ok {
+			fmt.Println("TOME_ROOT_DIR not set")
+			os.Exit(1)
+		}
+		maybeFile = path.Join(rootDir, maybeFile, arg)
+		maybeArgs = args[idx+1:]
+		fileInfo, err := os.Stat(maybeFile)
+		if os.IsNotExist(err) {
+			fmt.Printf("File %s does not exist\n", maybeFile)
+			continue
+		}
+
+		if err != nil {
+			fmt.Printf("Error checking file %s: %v\n", maybeFile, err)
+			continue
+		}
+
+		if fileInfo.IsDir() {
+			continue
+		}
+
+		if fileInfo.Mode()&0111 != 0 {
+			// Found an executable file
+			executable = maybeFile
+			break
+		}
+	}
+	if executable == "" {
+		fmt.Println("No executable file found")
+		os.Exit(1)
+	}
+
+	args = append([]string{maybeFile}, maybeArgs...)
+	err := syscall.Exec(maybeFile, args, os.Environ())
+	// Exec should create new process, so we should never get here except on error
+	if err != nil {
+		fmt.Printf("Error executing command: %v\n", err)
+		os.Exit(1)
+	}
+	return nil
+}
+
 // execCmd represents the exec command
 var execCmd = &cobra.Command{
 	Use:   "exec",
@@ -89,59 +144,7 @@ and usage of using your command. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) == 0 {
-			fmt.Println("No file specified")
-			os.Exit(1)
-		}
-
-		// Try joining one arg segment at a time and return the first one that exists and is executable
-		var maybeFile string
-		var executable string
-		var maybeArgs []string
-		for idx, arg := range args {
-
-			rootDir, ok := os.LookupEnv("TOME_ROOT_DIR")
-			if !ok {
-				fmt.Println("TOME_ROOT_DIR not set")
-				os.Exit(1)
-			}
-			maybeFile = path.Join(rootDir, maybeFile, arg)
-			maybeArgs = args[idx+1:]
-			fileInfo, err := os.Stat(maybeFile)
-			if os.IsNotExist(err) {
-				fmt.Printf("File %s does not exist\n", maybeFile)
-				continue
-			}
-
-			if err != nil {
-				fmt.Printf("Error checking file %s: %v\n", maybeFile, err)
-				continue
-			}
-
-			if fileInfo.IsDir() {
-				continue
-			}
-
-			if fileInfo.Mode()&0111 != 0 {
-				// Found an executable file
-				executable = maybeFile
-				break
-			}
-		}
-		if executable == "" {
-			fmt.Println("No executable file found")
-			os.Exit(1)
-		}
-
-		args = append([]string{maybeFile}, maybeArgs...)
-		err := syscall.Exec(maybeFile, args, os.Environ())
-		// Exec should create new process, so we should never get here except on error
-		if err != nil {
-			fmt.Printf("Error executing command: %v\n", err)
-			os.Exit(1)
-		}
-	},
+	RunE:              ExecRunE,
 	ValidArgsFunction: ValidArgsFunctionForScripts,
 }
 
