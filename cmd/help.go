@@ -1,5 +1,5 @@
 /*
-Copyright © 2024 NAME HERE <EMAIL ADDRESS>
+Copyright © 2024 Zander Hill <zander@xargs.io>
 */
 package cmd
 
@@ -9,8 +9,10 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strings"
 
+	"github.com/lithammer/dedent"
 	"github.com/spf13/cobra"
 )
 
@@ -53,7 +55,7 @@ func (s *Script) parse() error {
 		helpTextLines := lines[linesStart:helpEnds]
 		helpText := strings.Join(helpTextLines, "\n")
 
-		s.usage = strings.Split(helpTextLines[0], UsageKey)[1]
+		s.usage = strings.TrimSpace(strings.Split(lines[linesStart], UsageKey)[1])
 		s.help = helpText
 	} else {
 		fmt.Println("No help available")
@@ -61,16 +63,47 @@ func (s *Script) parse() error {
 	return nil
 }
 
+// Usage returns the usage string for the script
+// after stripping out the script name or $0
+// this is done to reduce visual noise
 func (s *Script) Usage() string {
-	return s.usage
+	var baseUsage string
+	prefixes := []string{"$0", filepath.Base(s.path)}
+	for _, prefix := range prefixes {
+		baseUsage = strings.TrimPrefix(s.usage, prefix)
+	}
+	return dedent.Dedent(baseUsage)
 }
 
 func (s *Script) Help() string {
-	return s.help
+	lines := strings.Split(s.help, "\n")
+	var helpTextLines []string
+	toTrim := []string{"#", "//", "/\\*", "\\*/", "--"}
+	toTrimRegex := regexp.MustCompile(fmt.Sprintf("^(%s)+", strings.Join(toTrim, "|")))
+	for _, line := range lines {
+		helpTextLines = append(helpTextLines, toTrimRegex.ReplaceAllString(line, ""))
+	}
+	return dedent.Dedent(strings.Join(helpTextLines, "\n"))
+}
+
+func (s *Script) PathWithoutRoot() string {
+	return strings.TrimPrefix(strings.TrimPrefix(s.path, s.root), string(filepath.Separator))
 }
 
 func (s *Script) PathSegments() []string {
-	return filepath.SplitList(strings.TrimPrefix(strings.TrimPrefix(s.path, s.root), string(filepath.Separator)))
+	return strings.Split(s.PathWithoutRoot(), string(filepath.Separator))
+}
+
+func (s *Script) PrintUsage() {
+	fmt.Printf("%s: %s\n", strings.Join(s.PathSegments(), " "), s.Usage())
+}
+
+// PrintHelp prints the full help text for the script
+// Help is inclusive of Usage and does not strip out
+// the script name or $0
+// TODO: consider stripping out leading comment characters such as #, //, etc
+func (s *Script) PrintHelp() {
+	fmt.Printf("%s\n---\n%s\n", strings.Join(s.PathSegments(), " "), s.Help())
 }
 
 func NewScript(path string, root string) *Script {
@@ -92,7 +125,6 @@ to quickly create a Cobra application.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		TOME_ROOT_DIR := os.Getenv("TOME_ROOT_DIR")
 		if len(args) == 0 {
-			// TODO: print all commands + usage
 			allExecutables := []string{}
 			fn := func(path string, info fs.FileInfo, err error) error {
 				if err != nil {
@@ -112,14 +144,13 @@ to quickly create a Cobra application.`,
 			}
 			for _, executable := range allExecutables {
 				s := NewScript(executable, TOME_ROOT_DIR)
-				fmt.Printf("%s: %s\n", strings.Join(s.PathSegments(), " "), s.Usage())
+				s.PrintUsage()
 			}
 		} else {
 			rootWithArgs := append([]string{TOME_ROOT_DIR}, args...)
 			filePath := path.Join(rootWithArgs...)
 			s := NewScript(filePath, TOME_ROOT_DIR)
-
-			fmt.Printf("%s: %s\n", strings.Join(s.PathSegments(), " "), s.Usage())
+			s.PrintHelp()
 		}
 		return nil
 	},
