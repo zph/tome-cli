@@ -1,0 +1,10 @@
+#!/bin/bash
+# USAGE: $0 <arg1> <arg2>
+# DESCRIPTION: This is a foo script
+# ARGUMENTS:
+#   <arg1> - The first argument
+#   <arg2> - The second argument
+# EXAMPLES:
+#   foo.sh 1 2
+
+echo 1
