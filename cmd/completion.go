@@ -86,7 +86,8 @@ func (rw *RenameWriter) Write(p []byte) (n int, err error) {
 }
 
 func ReplaceNameWithExecutableName(str string) string {
-	exec := stringy.New(executableName)
+	config := NewConfig()
+	exec := stringy.New(config.ExecutableName())
 	return strings.ReplaceAll(strings.ReplaceAll(str, "tome-cli", exec.KebabCase().Get()), "tome_cli", exec.SnakeCase().Get())
 }
 

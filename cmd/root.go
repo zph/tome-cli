@@ -9,14 +9,14 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/gobeam/stringy"
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
 
-var cfgFile string
 var rootDir string
 var executableName string
+var debug bool
 
 var (
 	replaceHyphenWithCamelCase = false
@@ -53,72 +53,45 @@ func init() {
 	// Disable the builtin help subcommand
 	rootCmd.SetHelpCommand(&cobra.Command{Hidden: true})
 
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "c", "config file (default is local directory or $HOME/.tome-cli.yaml)")
+	// We cannot directly bind viper to the rootCmd because
+	// the flag default values will override anything in config file :-/
+	// Instead we tried bindFlags from https://github.com/carolynvs/stingoftheviper/blob/main/main.go#L111-L128
+	// But that seems to break the environment variable binding
 	rootCmd.PersistentFlags().StringVarP(&rootDir, "root", "r", ".", "root directory containing scripts")
-	rootCmd.PersistentFlags().StringVarP(&executableName, "executable", "e", "tome-cli", "executable name")
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.PersistentFlags().StringVarP(&executableName, "executable", "e", "", "executable name")
+	rootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "debug logs")
+	viper.SetDefault("author", "Zander Hill <zander@xargs.io>")
+	viper.SetDefault("license", "mit")
 }
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	executablePath, err := os.Executable()
+	log := createLogger("initConfig")
+	v := viper.GetViper()
+	var err error
+	rootDir, err = filepath.Abs(rootDir)
+	log.Debug("rootDir", rootDir)
 	if err != nil {
-		panic(fmt.Sprintf(`Unable to determine executable path: %e`, err))
-	}
-	executableName = filepath.Base(executablePath)
-	// init code here
-
-	if cfgFile != "" {
-		// Use config file from the flag.
-		viper.SetConfigFile(cfgFile)
-	} else {
-		// Find home directory.
-		home, err := os.UserHomeDir()
-		cobra.CheckErr(err)
-
-		// Search config in home directory with name ".tome-cli" (without extension).
-		viper.AddConfigPath(home)
-		viper.AddConfigPath(".")
-		viper.SetConfigType("yaml")
-		viper.SetConfigName(executableName)
+		panic(fmt.Sprintf(`Unable to determine absolute path for root directory: %e`, err))
 	}
 
-	viper.SetEnvPrefix(executableName) // will be uppercased automatically
-	viper.AutomaticEnv()               // read in environment variables that match
-	// Environment variables can't have dashes in them, so bind them to their equivalent
-	// keys with underscores, e.g. --favorite-color to STING_FAVORITE_COLOR
-	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
-	bindFlags(rootCmd, viper.GetViper())
-
-	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
-	}
-}
-
-func bindFlags(cmd *cobra.Command, v *viper.Viper) {
-	cmd.Flags().VisitAll(func(f *pflag.Flag) {
-		// Determine the naming convention of the flags when represented in the config file
-		configName := f.Name
-		// If using camelCase in the config file, replace hyphens with a camelCased string.
-		// Since viper does case-insensitive comparisons, we don't need to bother fixing the case, and only need to remove the hyphens.
-		if replaceHyphenWithCamelCase {
-			configName = strings.ReplaceAll(f.Name, "-", "")
+	log.Debugw("executableName from flags", "var", executableName)
+	if executableName == "" {
+		executablePath, err := os.Executable()
+		if err != nil {
+			panic(fmt.Sprintf(`Unable to determine executable path: %e`, err))
 		}
+		executableName = filepath.Base(executablePath)
+		log.Debug("executableName from binary", executableName)
+	}
 
-		// Apply the viper config value to the flag when the flag is not set and viper has a value
-		if !f.Changed && v.IsSet(configName) {
-			val := v.Get(configName)
-			cmd.Flags().Set(f.Name, fmt.Sprintf("%v", val))
-		}
-	})
+	ex := stringy.New(executableName).SnakeCase().Get()
+	log.Debugw("env prefix", "ex", ex)
+	// TOME will be used consistently as the prefix for environment variables
+	// we will overlay env prefix with the executable name and use it if
+	// it is set to support multiple instances of the cli
+	v.SetEnvPrefix("TOME") // will be uppercased automatically
+	v.AutomaticEnv()       // read in environment variables that match
 }
 
 type Config struct {
@@ -128,6 +101,26 @@ func NewConfig() *Config {
 	return &Config{}
 }
 
+func (c *Config) EnvVarWithSuffix(suffix string) (string, bool) {
+	prefix := stringy.New(executableName).SnakeCase().Get()
+	val := os.Getenv(strings.ToUpper(prefix) + "_" + strings.ToUpper(suffix))
+	ok := val != ""
+
+	return val, ok
+}
+
+func (c *Config) EnvVarOrViperValue(val string) string {
+	v, ok := c.EnvVarWithSuffix(val)
+	if ok {
+		return v
+	}
+	return viper.GetViper().GetString(val)
+}
+
 func (c *Config) RootDir() string {
-	return viper.GetString("root")
+	return c.EnvVarOrViperValue("root")
+}
+
+func (c *Config) ExecutableName() string {
+	return c.EnvVarOrViperValue("executable")
 }

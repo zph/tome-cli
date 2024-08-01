@@ -16,24 +16,25 @@ All of which
 ```
 # Capabilities
 
-- exec scripts in a directory
-- auto-complete script names (https://github.com/spf13/cobra/blob/main/site/content/completions/_index.md)
-- auto-complete script arguments
-- pre-hooks (hooks.d folder will be sourced in order or executed before the real script)
-- cross compilation
-- test harness for the commands
-- tests based on simulated fs
-- uncertain if it will allow for sourcing as a core benefit, if so it will be under dedicated
-  command (source)
-- injects TOME_ROOT into tooling as env var (but could inject as MY_COMMAND_ROOT if users have
-  multiple tome-cli running)
-- Determines root folder based on:
-    1. cli flag
-    2. env var named after binary (eg auto detect and use PARROT_ROOT if alias name is parrot)
-- Respects a .gitignore type file in root of project
-- Add description to command completions
-- Use https://github.com/spf13/cobra/blob/main/site/content/completions/_index.md#creating-your-own-completion-command
-  to override and rename from tome-cli to whatever the binary name is on their system
+- [ ] exec scripts in a directory
+- [ ] auto-complete script names (https://github.com/spf13/cobra/blob/main/site/content/completions/_index.md)
+- [x] auto-complete script arguments
+- [ ] pre-hooks (hooks.d folder will be sourced in order or executed before the real script)
+- [ ] cross compilation
+- [ ] test harness for the commands
+- [ ] tests based on simulated fs
+- [ ] uncertain if it will allow for sourcing as a core benefit, if so it will be under dedicated
+  [ ] command (source)
+- [ ] injects TOME_ROOT into tooling as env var (but could inject as MY_COMMAND_ROOT if users have
+  [ ] multiple tome-cli running)
+- [ ] Determines root folder based on:
+        1. cli flag
+        2. env var named after binary (eg auto detect and use PARROT_ROOT if alias name is parrot)
+- [ ] Respects a .gitignore type file in root of project
+- [ ] Add description to command completions
+- [ ] Use https://github.com/spf13/cobra/blob/main/site/content/completions/_index.md#creating-your-own-completion-command
+  [ ] to override and rename from tome-cli to whatever the binary name is on their system
+- [ ] add tome compatibility layer for transition or include shell script shim
 
 # Why rewrite?
 
