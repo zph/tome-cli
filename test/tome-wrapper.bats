@@ -5,7 +5,8 @@ load 'test_helper/bats-support/load'
 
 bats_require_minimum_version 1.5.0
 
-script="$BATS_TEST_DIRNAME/../bin/tome-wrapper"
+script="$BATS_TEST_DIRNAME/wrapper.sh"
+export PATH="bin:$PATH"
 export TOME_DEBUG=1
 
 @test "Test command-execute branch" {

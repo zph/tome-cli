@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+# Usage: tome-wrapper [options]
+# This script is the wrapper for the Tome CLI tool.
+# To use it, copy this script into your project as a shim to the tome-cli executable.
+# $ cp bin/tome-wrapper bin/kit
+
+set -euo pipefail
+
+if [[ -z "${TOME_DEBUG:-}" ]]; then
+  exec_cmd() {
+    exec "$@"
+  }
+else
+  exec_cmd() {
+    echo "$@"
+    exit 0
+  }
+fi
+
+# This is the name used for the wrapper and shell completions
+# if the final commandline tool is `kit` this would be `kit`
+export TOME_CLI_EXECUTABLE="{{ .ExecutableAlias }}"
+
+# Set the root directory of tome-cli project
+export TOME_CLI_ROOT="{{ .Root }}"
+
+# Compatibility layer with former tome executable
+# from https://github.com/zph/tome or upstream
+if [[ -z "${1:-}" ]]; then
+  exec_cmd "tome-cli"
+fi
+readonly cmd="$1"
+case "$cmd" in
+  command-*)
+    if [[ -z "${2:-}" ]]; then
+      echo "ERROR: in compatibility mode the command and folder must be supplied" >&2
+      exit 1
+    fi
+    export TOME_CLI_ROOT="$2"
+    shift 2
+    case "$cmd" in
+      command-execute)
+        exec_cmd "tome-cli" exec "$@"
+        ;;
+      command-help)
+        exec_cmd "tome-cli" help "$@"
+        ;;
+      command-complete)
+        echo "WARNING: not implemented, stop using command-complete"
+        echo "The likely solution is to update your shell script initialization"
+        exit 1
+        ;;
+    esac
+    exec_cmd "tome-cli" command "$@"
+    ;;
+  run)
+    export TOME_CLI_ROOT="$2"
+    shift 2
+    exec_cmd "tome-cli" exec "$@"
+    ;;
+  init)
+    # Could be either new or old tome
+    # former signature
+    # tome init my-commands ~/my-scripts zsh
+    # If arg 3 is a directory, then it's the old tome
+    # Shim in tome debug case for testing
+    if [[ -d "${3:-}" ]];then
+      export TOME_CLI_ROOT="$3"
+      exec_cmd "tome-cli" init "$4"
+    fi
+    ;;
+esac
+# Call tome-cli with the provided arguments
+exec_cmd "tome-cli" "$@"

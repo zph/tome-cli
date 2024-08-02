@@ -60,13 +60,16 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&rootDir, "root", "r", ".", "root directory containing scripts")
 	rootCmd.PersistentFlags().StringVarP(&executableName, "executable", "e", "", "executable name")
 	rootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "debug logs")
+	viper.BindPFlag("root", rootCmd.PersistentFlags().Lookup("root"))
+	viper.BindPFlag("executable", rootCmd.PersistentFlags().Lookup("executable"))
+	viper.BindPFlag("debug", rootCmd.PersistentFlags().Lookup("debug"))
 	viper.SetDefault("author", "Zander Hill <zander@xargs.io>")
 	viper.SetDefault("license", "mit")
 }
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	log := createLogger("initConfig")
+	log := createLogger("initConfig", rootCmd.OutOrStdout())
 	v := viper.GetViper()
 	var err error
 	rootDir, err = filepath.Abs(rootDir)

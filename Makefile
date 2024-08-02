@@ -13,11 +13,19 @@ clean:
 
 deps:
 	go mod tidy
-	git submodule add https://github.com/bats-core/bats-core.git test/bats
-	git submodule add https://github.com/bats-core/bats-support.git test/test_helper/bats-support
-	git submodule add https://github.com/bats-core/bats-assert.git test/test_helper/bats-assert
+	[[ -d test/bats ]] || git submodule add https://github.com/bats-core/bats-core.git test/bats
+	[[ -d test/test_helper/bats-support ]] || git submodule add https://github.com/bats-core/bats-support.git test/test_helper/bats-support
+	[[ -d test/test_helper/bats-assert ]] || git submodule add https://github.com/bats-core/bats-assert.git test/test_helper/bats-assert
 
-test:
+test: test-go test-e2e
+
+test/wrapper.sh: build
+	@ $(BINARY) --executable wrapper.sh --root examples alias --write test/wrapper.sh
+
+test-e2e: test/wrapper.sh build
+	@ ./test/bats/bin/bats test/*.bats
+
+test-go:
 	go test ./...
 
 run: build
