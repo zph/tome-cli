@@ -55,6 +55,16 @@ tome completion zsh
   - [ ] https://umarcor.github.io/cobra/#prerun-and-postrun-hooks
 - [ ] injects TOME_ROOT into tooling as env var (but could inject as MY_COMMAND_ROOT if users have multiple tome-cli running)
 - [ ] See if there's utility in ActiveHelp https://umarcor.github.io/cobra/#active-help
+- [ ] for hooks we can use the following though post runs won't work alongside our exec pattern
+```
+	// The *Run functions are executed in the following order:
+	//   * PersistentPreRun()
+	//   * PreRun()
+	//   * Run()
+	//   * PostRun()
+	//   * PersistentPostRun()
+```
+- [x] Add level and k/v style logging
 
 ## Non Features
 
