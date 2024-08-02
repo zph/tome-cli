@@ -6,6 +6,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path"
 	"strings"
 	"syscall"
@@ -17,6 +18,68 @@ func ValidArgsFunctionForScripts(cmd *cobra.Command, args []string, toComplete s
 	config := NewConfig()
 	rootDir := config.RootDir()
 
+	if debug {
+		cobra.CompDebugln(fmt.Sprintf(`completion: args=%+v, toComplete=%s`, args, toComplete), true)
+	}
+	// If we have an executable file in the path, we're working on completions for that script itself via --completion
+	var argsAccumulator []string
+	// Iteration must exit on first matching executable file or it breaks invariants of code
+	for _, arg := range args {
+		// __complete is passed as an internal directive
+		if arg == "__complete" {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+		argsAccumulator = append(argsAccumulator, arg)
+		joint := path.Join(append([]string{rootDir}, argsAccumulator...)...)
+		f, err := os.Stat(joint)
+		if debug {
+			cobra.CompDebugln(fmt.Sprintf(`completion: joint=%s`, joint), true)
+			cobra.CompDebugln(fmt.Sprintf(`completion: executable=%s`, f.Mode()), true)
+		}
+		if err == nil && isExecutableByOwner(f.Mode()) {
+			s := NewScript(joint, rootDir)
+			// We have an executable file in the path
+			// Handle completion for the script itself via --completion
+
+			/*
+				Check if the script contains word --completion
+			*/
+			if debug {
+				cobra.CompDebugln(fmt.Sprintf(`completion: hasCompletions=%t`, s.HasCompletions()), true)
+			}
+			if !s.HasCompletions() {
+				return nil, cobra.ShellCompDirectiveNoFileComp
+			}
+
+			/*
+				Extract the completion values from the script
+			*/
+			// Execute the joint path as a shell script
+			completionFlag := []string{"--completion"}
+			output, err := exec.Command(joint, completionFlag...).Output()
+			if debug {
+				cobra.CompDebugln(fmt.Sprintf(`completion: output=%s`, output), true)
+			}
+			if err != nil {
+				return nil, cobra.ShellCompDirectiveError
+			}
+
+			// Split the output into lines
+			lines := strings.Split(string(output), "\n")
+
+			// Remove empty lines
+			var completions []string
+			for _, line := range lines {
+				if line != "" {
+					completions = append(completions, line)
+				}
+			}
+
+			return completions, cobra.ShellCompDirectiveNoFileComp
+		}
+	}
+
+	// Otherwise we're completing the path to the script
 	fullPathSegments := append([]string{rootDir}, args...)
 	fullPath := path.Join(fullPathSegments...)
 
@@ -28,7 +91,6 @@ func ValidArgsFunctionForScripts(cmd *cobra.Command, args []string, toComplete s
 		return nil, cobra.ShellCompDirectiveNoFileComp
 	}
 
-	// TODO: how do we do completions for arbitrary binary name? right now it uses tome-cli
 	var toCompleteEntries []string
 	if toComplete == "" {
 		for _, entry := range entries {
@@ -47,28 +109,15 @@ func ValidArgsFunctionForScripts(cmd *cobra.Command, args []string, toComplete s
 		if strings.HasSuffix(entry, "/") {
 			executableOrDirectories = append(executableOrDirectories, entry)
 		} else {
-			fileInfo, err := os.Stat(path.Join(fullPath, entry))
-			if err != nil {
-				fmt.Printf("Error checking file %s: %v\n", entry, err)
-				continue
-			}
-			if fileInfo.IsDir() {
+			fullPathWithEntry := path.Join(fullPath, entry)
+			s := NewScript(fullPathWithEntry, rootDir)
+			if s.IsDir() {
 				executableOrDirectories = append(executableOrDirectories, entry+"\tdirectory")
-			} else if fileInfo.Mode()&0111 != 0 {
-				// Found an executable file
-				b, err := os.ReadFile(path.Join(fullPath, entry))
-				if err != nil {
-					return nil, cobra.ShellCompDirectiveError
+			} else if s.IsExecutable() {
+				if debug {
+					cobra.CompDebugln(fmt.Sprintf(`completion: fullPath=%s, entry=%s, %+v`, fullPath, entry, s), true)
 				}
-				lines := strings.Split(string(b), "\n")
-				var usage string
-				for _, line := range lines {
-					if strings.Contains(line, UsageKey) {
-						usage = strings.Split(line, UsageKey)[1]
-						break
-					}
-				}
-				executableOrDirectories = append(executableOrDirectories, entry+"\t"+usage)
+				executableOrDirectories = append(executableOrDirectories, entry+"\t"+s.Usage())
 			}
 		}
 	}

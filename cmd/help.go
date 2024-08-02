@@ -29,6 +29,30 @@ type Script struct {
 	root  string
 }
 
+func (s *Script) HasCompletions() bool {
+	body, err := os.ReadFile(s.path)
+	if err != nil {
+		return false
+	}
+	return strings.Contains(string(body), "completion")
+}
+
+func (s *Script) IsDir() bool {
+	fileInfo, err := os.Stat(s.path)
+	if err != nil {
+		fmt.Printf("Error checking file %s: %v\n", s.path, err)
+	}
+	return fileInfo.IsDir()
+}
+
+func (s *Script) IsExecutable() bool {
+	fileInfo, err := os.Stat(s.path)
+	if err != nil {
+		fmt.Printf("Error checking file %s: %v\n", s.path, err)
+	}
+	return isExecutableByOwner(fileInfo.Mode())
+}
+
 func (s *Script) parse() error {
 	b, err := os.ReadFile(s.path)
 	if err != nil {
@@ -67,11 +91,12 @@ func (s *Script) parse() error {
 // after stripping out the script name or $0
 // this is done to reduce visual noise
 func (s *Script) Usage() string {
-	var baseUsage string
+	baseUsage := s.usage
 	prefixes := []string{"$0", filepath.Base(s.path)}
 	for _, prefix := range prefixes {
-		baseUsage = strings.TrimPrefix(s.usage, prefix)
+		baseUsage = strings.TrimPrefix(baseUsage, prefix)
 	}
+	baseUsage = strings.TrimSpace(baseUsage)
 	return dedent.Dedent(baseUsage)
 }
 
@@ -133,6 +158,7 @@ var helpCmd = &cobra.Command{
 				}
 				return nil
 			}
+			// TODO: does not handle symlinks, consider fb symlinkWalk instead
 			err := filepath.Walk(rootDir, fn)
 			if err != nil {
 				return err
