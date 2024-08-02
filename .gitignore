@@ -1,3 +1,5 @@
 tome-cli
 bin
 test/wrapper.sh
+
+dist/

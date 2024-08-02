@@ -11,7 +11,10 @@ clean:
 	go clean
 	rm -f $(BINARY)
 
-deps:
+deps-chlogs:
+	go install github.com/goreleaser/chglog/cmd/chglog@latest
+
+deps: deps-chlogs
 	go mod tidy
 	[[ -d test/bats ]] || git submodule add https://github.com/bats-core/bats-core.git test/bats
 	[[ -d test/test_helper/bats-support ]] || git submodule add https://github.com/bats-core/bats-support.git test/test_helper/bats-support

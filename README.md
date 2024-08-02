@@ -47,11 +47,14 @@ tome completion zsh
       to override and rename from tome-cli to whatever the binary name is on their system
 - [x] add tome compatibility layer for transition or include shell script shim
 - [ ] Add instructions to README
-- [ ] Add a docs folder for more full instructions
+- [ ] Generate a docs folder for more full instructions (https://umarcor.github.io/cobra/#generating-markdown-docs-for-your-own-cobracommand)
+- [ ] Setup changelog tooling ([chglog init](https://github.com/goreleaser/chglog))
 - [ ] Respects a .gitignore type file in root of project to determine what to complete/execute
 - [ ] auto-complete script arguments
 - [ ] pre-hooks (hooks.d folder will be sourced in order or executed before the real script)
+  - [ ] https://umarcor.github.io/cobra/#prerun-and-postrun-hooks
 - [ ] injects TOME_ROOT into tooling as env var (but could inject as MY_COMMAND_ROOT if users have multiple tome-cli running)
+- [ ] See if there's utility in ActiveHelp https://umarcor.github.io/cobra/#active-help
 
 ## Non Features
 
