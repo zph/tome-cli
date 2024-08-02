@@ -42,7 +42,7 @@ The generated script uses the executable name and root directory specified in th
 			log.Fatalln(err)
 		}
 		buf := new(bytes.Buffer)
-		v, err := cmd.Flags().GetString("write")
+		v, err := cmd.Flags().GetString("output")
 		if err != nil {
 			panic("Error getting write flag value")
 		}
