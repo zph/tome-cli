@@ -56,6 +56,6 @@ The generated script uses the executable name and root directory specified in th
 }
 
 func init() {
-	aliasCmd.Flags().StringVarP(&writePath, "write", "w", "", "Write the alias to a file")
+	aliasCmd.Flags().StringVarP(&writePath, "output", "o", "", "Write the alias to a file")
 	rootCmd.AddCommand(aliasCmd)
 }
