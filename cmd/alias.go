@@ -1,5 +1,5 @@
 /*
-Copyright © 2024 NAME HERE <EMAIL ADDRESS>
+Copyright © 2024 Zander Hill <zander@xargs.io>
 */
 package cmd
 
@@ -26,13 +26,10 @@ var writePath string
 // aliasCmd represents the alias command
 var aliasCmd = &cobra.Command{
 	Use:   "alias",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Create an alias wrapper for tome-cli",
+	Long: `The alias command allows you to create an alias for the tome command.
+This can be useful if you wish to embed common flags like root and executable name and alias the command as a different name.
+The generated script uses the executable name and root directory specified in the tome configuration file.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		config := NewConfig()
 		s := ScriptTemplate{

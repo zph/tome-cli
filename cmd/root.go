@@ -25,17 +25,19 @@ var (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "tome-cli",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
+	Short: "A cli tool to manage scripts as a set of subcommands",
+	Long: `tome-cli is a command-line tool that allows you to manage scripts as a set of subcommands.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+It succeeds sub and tome as a third generation that borrows much of it's design from those projects.
+
+It provides a convenient way to organize and execute scripts within a project.
+By loading the context of the full git repository, tome-cli enables you to access and execute scripts specific to your project. It leverages the power of Cobra, a CLI library for Go, to provide a user-friendly and efficient command-line interface.
+For more information and usage examples, please refer to the documentation and examples provided in the repository.`,
 	// Bare command is `exec` and it requires at least one argument
 	Args: cobra.MinimumNArgs(1),
 	RunE: ExecRunE,
-	// TODO: validate that auto-completion includes scripts currently only includes subcommands
+	// cobra automatically injects subcommands into the custom shell completion :)
+	// So in this case we have subcommands mixed with scripts auto-completion
 	ValidArgsFunction: ValidArgsFunctionForScripts,
 }
 

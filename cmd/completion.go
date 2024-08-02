@@ -1,5 +1,5 @@
 /*
-Copyright © 2024 NAME HERE <EMAIL ADDRESS>
+Copyright © 2024 Zander Hill <zander@xargs.io>
 */
 package cmd
 
@@ -59,6 +59,7 @@ PowerShell:
 	DisableFlagsInUseLine: true,
 	ValidArgs:             []string{"bash", "zsh", "fish", "powershell"},
 	Args:                  cobra.MatchAll(cobra.ExactArgs(1), cobra.OnlyValidArgs),
+	Aliases:               []string{"init"},
 	Run: func(cmd *cobra.Command, args []string) {
 		stdoutWrappedWriter := &RenameWriter{writer: os.Stdout}
 		switch args[0] {
