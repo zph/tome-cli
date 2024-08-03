@@ -49,7 +49,7 @@ tome completion zsh
 - [ ] Add instructions to README
 - [ ] Generate a docs folder for more full instructions (https://umarcor.github.io/cobra/#generating-markdown-docs-for-your-own-cobracommand)
 - [ ] Setup changelog tooling ([chglog init](https://github.com/goreleaser/chglog))
-- [ ] Respects a .gitignore type file in root of project to determine what to complete/execute
+- [ ] Respects a .gitignore type file in root of project to determine what to complete/execute (https://github.com/sabhiram/go-gitignore)
 - [ ] auto-complete script arguments
 - [ ] pre-hooks (hooks.d folder will be sourced in order or executed before the real script)
   - [ ] https://umarcor.github.io/cobra/#prerun-and-postrun-hooks
