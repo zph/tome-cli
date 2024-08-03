@@ -1,0 +1,162 @@
+- semver: 0.0.1
+  date: 2024-08-03T09:17:08-07:00
+  packager: Zander Hill <zander@xargs.io>
+  changes:
+    - commit: 40d37218726b1bd967dd1a719ec0307df2ece5fc
+      note: Inject TOME_ROOT and TOME_EXECUTABLE into context of scripts
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 6663f16777518fb94196b2b024c1e8419b50fb0b
+      note: Enable script arguments auto completion
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: b5a64ad17a063ba30b17651e9a340a5de1f322bf
+      note: Update README
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 3d32326e9339eb43f99622c1a6078901d01dd85c
+      note: Add changes for exec
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: da65585c526e85621c87a1bac7d634748f7235a6
+      note: Fix --output
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 8fc004b52238910b9f3f4868ad12862b05027b12
+      note: Remote TODO file
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: f5a86fb91c23e8ea160e627601196aafba25c5a2
+      note: Add skeleton setup for goreleaser
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 5b003ab2ddaadf1661500a6ae3ed4808bbae54ff
+      note: Update README
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: bf66f85c0a3dccf24cf34283b3869b5970e8b0d7
+      note: Update help text
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: fbd8d5d840eafe2e6f2e2758f36223762858284e
+      note: Add tests and refactor to use io.Writer from cmd
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 2b0e28158e0892fea0ce4e12a3e6f06bb0413ae0
+      note: Add bats deps management
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: fa1aa62aa368709a69c5e1223346b8ef56d4cb25
+      note: Add bats and tests for tome-wrapper
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 6dd4772f535d7365d1f7689f5b169270ef5a1115
+      note: Work through config overlay issues and settle on a design
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: e51203d1a45d776233fb656e89ddbb56f5578e7b
+      note: |-
+        Wrap command completion generation to allow renaming executable
+
+        Since tome-cli will often be used as an alias or a renamed binary,
+        we need to support completion text that will respect a renamed binary.
+
+        A follow on PR will change this for alias cases if needed.
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 23bed8bce3fc851f1a907bcd7f81f6f6b0b9bb8e
+      note: Use viper configuration and abstract behind config struct
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: d234a6b0e15ee11819de7379f514b0e06410f6fd
+      note: Improve help output and tab completions
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 6726b963e92e5974ef77293a51c784dedbfb99e3
+      note: Build script struct and parse usage and help text from files
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 17888644fd822113174f501bf3016d3b56000a09
+      note: Second commit building out exec and help and dynamic completions
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: c3273fcdaa4d29f0fb07300367e03c57f545ddb0
+      note: Initial scaffolding commit
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
