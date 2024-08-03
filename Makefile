@@ -37,7 +37,9 @@ run: build
 tag:
 	git tag v$(shell cat VERSION)
 	git push origin v$(shell cat VERSION)
-	chglog add --version v$(shell cat VERSION)
+	# This works with versions while add --version isn't
+	chglog init
 
 changelog:
-	chglog add --version v$(shell cat VERSION)
+	chglog init
+	chglog format --template repo > CHANGELOG.md
