@@ -12,6 +12,7 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/gobeam/stringy"
 	"github.com/spf13/cobra"
 )
 
@@ -189,6 +190,11 @@ func ExecRunE(cmd *cobra.Command, args []string) error {
 	envs := os.Environ()
 	envs = append(envs, fmt.Sprintf("TOME_ROOT=%s", absRootDir))
 	envs = append(envs, fmt.Sprintf("TOME_EXECUTABLE=%s", config.ExecutableName()))
+
+	// Inject the named arguments as well
+	executableAsEnvPrefix := strings.ToUpper(stringy.New(config.ExecutableName()).SnakeCase().Get())
+	envs = append(envs, fmt.Sprintf("%s_ROOT=%s", executableAsEnvPrefix, absRootDir))
+	envs = append(envs, fmt.Sprintf("%s_EXECUTABLE=%s", executableAsEnvPrefix, config.ExecutableName()))
 
 	args = append([]string{maybeFile}, maybeArgs...)
 	err = syscall.Exec(maybeFile, args, envs)

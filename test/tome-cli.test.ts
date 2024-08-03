@@ -7,75 +7,92 @@ const env = {
   PATH: "bin:" + Deno.env.get("PATH"),
 }
 
+const envWrapper = {
+  TOME_ROOT: "examples",
+  TOME_EXECUTABLE: "wrapper.sh",
+  PATH: "test/bin:" + Deno.env.get("PATH"),
+}
+
+const wrapper = async (args: string) => {
+  const v = await $.raw`wrapper.sh ${args}`.env(envWrapper).stderr("inherit").stdout("inherit").captureCombined().noThrow()
+  const r = v.stdout.trimEnd()
+  return { code: v.code, out: r, lines: r.split("\n"), asKeyVal: r.split("\n").map((l) => l.split("\t").map(t => t.trim())), executable: "wrapper.sh" }
+}
+
 const tome = async (args: string) => {
   const v = await $.raw`tome-cli ${args}`.env(env).stderr("inherit").stdout("inherit").captureCombined().noThrow()
   const r = v.stdout.trimEnd()
-  return { code: v.code, out: r, lines: r.split("\n"), asKeyVal: r.split("\n").map((l) => l.split("\t").map(t => t.trim())) }
+  return { code: v.code, out: r, lines: r.split("\n"), asKeyVal: r.split("\n").map((l) => l.split("\t").map(t => t.trim())), executable: "tome-cli" }
 }
 
-Deno.test("top level -h", async function (t): Promise<void> {
-  const { out } = await tome("-h");
-  await assertSnapshot(t, out);
-});
+for await (let [executable, fn] of [["tome-cli", tome], ["wrapper.sh", wrapper]]) {
+  executable = executable as string
+  fn = fn as () => any
+  Deno.test(`top level -h`, async function (t): Promise<void> {
+    const { out } = await fn("-h");
+    await assertSnapshot(t, out);
+  });
 
-Deno.test("top level help", async function (t): Promise<void> {
-  const { lines } = await tome("help");
-  assertEquals(lines, [
-    "folder bar: <arg1> <arg2>",
-    "folder test-env-injection: ",
-    "foo: <arg1> <arg2>",
-  ]);
-});
+  Deno.test(`top level help`, async function (t): Promise<void> {
+    const { lines } = await fn("help");
+    assertEquals(lines, [
+      "folder bar: <arg1> <arg2>",
+      "folder test-env-injection: ",
+      "foo: <arg1> <arg2>",
+    ]);
+  });
 
-Deno.test("completion", async function (t): Promise<void> {
-  const { asKeyVal } = await tome("__complete exec fo");
-  assertEquals(asKeyVal.slice(0, 2), [
-    ["folder", "directory"],
-    ["foo", "<arg1> <arg2>"],
-  ]);
-});
+  Deno.test(`completion`, async function (t): Promise<void> {
+    const { out, asKeyVal } = await fn("__complete exec fo");
+    console.log(out)
+    assertEquals(asKeyVal.slice(0, 2), [
+      ["folder", "directory"],
+      ["foo", "<arg1> <arg2>"],
+    ]);
+  });
 
-Deno.test("completion folder", async function (t): Promise<void> {
-  const { out } = await tome("__complete exec fold");
-  await assertSnapshot(t, out);
-});
+  Deno.test(`completion folder`, async function (t): Promise<void> {
+    const { out } = await fn("__complete exec fold");
+    await assertSnapshot(t, out);
+  });
 
-Deno.test("completion nested script", async function (t): Promise<void> {
-  const {out} = await tome("__complete exec folder bar");
-  await assertSnapshot(t, out);
-});
+  Deno.test(`completion nested script`, async function (t): Promise<void> {
+    const { out } = await fn("__complete exec folder bar");
+    await assertSnapshot(t, out);
+  });
 
-Deno.test("completion nested script arguments", async function (t): Promise<void> {
-  const {out} = await tome(`__complete exec foo ""`);
-  await assertStringIncludes(out, "--help");
-});
+  Deno.test(`completion nested script arguments`, async function (t): Promise<void> {
+    const { out } = await fn(`__complete exec foo ""`);
+    await assertStringIncludes(out, "--help");
+  });
 
-Deno.test("completion nested script arguments if they implement --completion", async function (t): Promise<void> {
-  const {lines} = await tome(`__complete exec foo ""`);
-  await assertEquals(lines, [
-    "--help\tHelp message for foo",
-    "--query\tQuery message for foo",
-    "an-argument\tArgument",
-    ":4",
-    "Completion ended with directive: ShellCompDirectiveNoFileComp",
-  ]);
-});
+  Deno.test(`completion nested script arguments if they implement --completion`, async function (t): Promise<void> {
+    const { lines } = await fn(`__complete exec foo ""`);
+    await assertEquals(lines, [
+      "--help\tHelp message for foo",
+      "--query\tQuery message for foo",
+      "an-argument\tArgument",
+      ":4",
+      "Completion ended with directive: ShellCompDirectiveNoFileComp",
+    ]);
+  });
 
-// Testing this because executing scripts is dangerous if they're not opted in
-Deno.test("completion nested script arguments does not execute script if not implementing --completion", async function (t): Promise<void> {
-  const {code, lines} = await tome(`__complete exec folder bar ""`);
-  assertEquals(code, 0);
-  await assertEquals(lines, [
-    ":4",
-    "Completion ended with directive: ShellCompDirectiveNoFileComp",
-  ]);
-});
+  // Testing this because executing scripts is dangerous if they're not opted in
+  Deno.test(`completion nested script arguments does not execute script if not implementing --completion`, async function (t): Promise<void> {
+    const { code, lines } = await fn(`__complete exec folder bar ""`);
+    assertEquals(code, 0);
+    await assertEquals(lines, [
+      ":4",
+      "Completion ended with directive: ShellCompDirectiveNoFileComp",
+    ]);
+  });
 
-Deno.test("injects TOME_ROOT and TOME_EXECUTABLE into environment of script", async function (t): Promise<void> {
-  const {code, lines} = await tome(`exec folder test-env-injection`);
-  assertEquals(code, 0);
-  await assertEquals(lines.filter(l => l.startsWith("TOME_")), [
-    `TOME_ROOT=${Deno.env.get("PWD")}/examples`,
-    "TOME_EXECUTABLE=tome-cli",
-  ]);
-});
+  Deno.test(`${executable}: injects TOME_ROOT and TOME_EXECUTABLE into environment of script`, async function (t): Promise<void> {
+    const { code, lines, executable } = await fn(`exec folder test-env-injection`);
+    assertEquals(code, 0);
+    await assertEquals(lines.filter(l => l.startsWith("TOME_ROOT=") || l.startsWith("TOME_EXECUTABLE=")), [
+      `TOME_ROOT=${Deno.env.get("PWD")}/examples`,
+      `TOME_EXECUTABLE=${executable}`,
+    ]);
+  });
+}
