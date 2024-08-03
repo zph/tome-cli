@@ -37,7 +37,7 @@ run: build
 tag:
 	git tag v$(shell cat VERSION)
 	git push origin v$(shell cat VERSION)
-	chglog add --version $(shell cat VERSION)
+	chglog add --version v$(shell cat VERSION)
 
 changelog:
-	chglog --next-tag $(shell git describe --tags --abbrev=0)
+	chglog add --version v$(shell cat VERSION)
