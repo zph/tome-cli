@@ -1,0 +1,52 @@
+export const snapshot = {};
+
+snapshot[`top level -h 1`] = `
+\`tome-cli is a command-line tool that allows you to manage scripts as a set of subcommands.
+
+It succeeds sub and tome as a third generation that borrows much of it's design from those projects.
+
+It provides a convenient way to organize and execute scripts within a project.
+By loading the context of the full git repository, tome-cli enables you to access and execute scripts specific to your project. It leverages the power of Cobra, a CLI library for Go, to provide a user-friendly and efficient command-line interface.
+For more information and usage examples, please refer to the documentation and examples provided in the repository.
+
+Usage:
+  tome-cli [flags]
+  tome-cli [command]
+
+Available Commands:
+  alias       Create an alias wrapper for tome-cli
+  completion  Generate completion script
+  exec        executes a script
+  help        help displays the usage and help text for a script
+
+Flags:
+  -d, --debug               debug logs
+  -e, --executable string   executable name
+  -h, --help                help for tome-cli
+  -r, --root string         root directory containing scripts (default ".")
+
+Use "tome-cli [command] --help" for more information about a command.\`
+`;
+
+snapshot[`top level help 1`] = `
+"folder bar: <arg1> <arg2>
+foo: <arg1> <arg2>"
+`;
+
+snapshot[`completion 1`] = `
+"folder	directory
+foo	<arg1> <arg2>
+:4
+Completion ended with directive: ShellCompDirectiveNoFileComp"
+`;
+
+snapshot[`completion folder 1`] = `
+"folder	directory
+:4
+Completion ended with directive: ShellCompDirectiveNoFileComp"
+`;
+
+snapshot[`completion nested script 1`] = `
+":4
+Completion ended with directive: ShellCompDirectiveNoFileComp"
+`;

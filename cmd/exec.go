@@ -27,7 +27,7 @@ func ValidArgsFunctionForScripts(cmd *cobra.Command, args []string, toComplete s
 	for _, arg := range args {
 		// __complete is passed as an internal directive
 		if arg == "__complete" {
-			return nil, cobra.ShellCompDirectiveNoFileComp
+			continue
 		}
 		argsAccumulator = append(argsAccumulator, arg)
 		joint := path.Join(append([]string{rootDir}, argsAccumulator...)...)
@@ -67,9 +67,15 @@ func ValidArgsFunctionForScripts(cmd *cobra.Command, args []string, toComplete s
 			// Split the output into lines
 			lines := strings.Split(string(output), "\n")
 
+			if debug {
+				cobra.CompDebugln(fmt.Sprintf(`completion: lines=%s`, lines), true)
+			}
 			// Remove empty lines
 			var completions []string
 			for _, line := range lines {
+				if debug {
+					cobra.CompDebugln(fmt.Sprintf(`completion: line=%+v`, line), true)
+				}
 				if line != "" {
 					completions = append(completions, line)
 				}

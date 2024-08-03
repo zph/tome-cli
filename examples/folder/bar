@@ -8,3 +8,8 @@
 #   foo.sh 1 2
 
 echo 1
+
+# Set to exit 1 to test comp scripts
+# and assert they do not execute this script
+# with the comp flag
+exit 1

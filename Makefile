@@ -16,9 +16,8 @@ deps-chlogs:
 
 deps: deps-chlogs
 	go mod tidy
-	[[ -d test/bats ]] || git submodule add https://github.com/bats-core/bats-core.git test/bats
-	[[ -d test/test_helper/bats-support ]] || git submodule add https://github.com/bats-core/bats-support.git test/test_helper/bats-support
-	[[ -d test/test_helper/bats-assert ]] || git submodule add https://github.com/bats-core/bats-assert.git test/test_helper/bats-assert
+	git submodule init
+	git submodule update
 
 test: test-go test-e2e
 
@@ -27,6 +26,7 @@ test/wrapper.sh: build
 
 test-e2e: test/wrapper.sh build
 	@ ./test/bats/bin/bats test/*.bats
+	@ deno test --allow-env --allow-read --allow-run test/*.ts
 
 test-go:
 	go test ./...

@@ -71,7 +71,7 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	log := createLogger("initConfig", rootCmd.OutOrStdout())
+	log := createLogger("initConfig", rootCmd.OutOrStderr())
 	v := viper.GetViper()
 	var err error
 	rootDir, err = filepath.Abs(rootDir)

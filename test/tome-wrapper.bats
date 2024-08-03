@@ -1,4 +1,5 @@
 #!/usr/bin/env bats
+# TODO: deprecate this and move it into deno testing for better control
 
 load 'test_helper/bats-support/load'
 load 'test_helper/bats-support/load'

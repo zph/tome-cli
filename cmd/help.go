@@ -34,7 +34,7 @@ func (s *Script) HasCompletions() bool {
 	if err != nil {
 		return false
 	}
-	return strings.Contains(string(body), "completion")
+	return strings.Contains(string(body), "TOME_COMPLETION")
 }
 
 func (s *Script) IsDir() bool {

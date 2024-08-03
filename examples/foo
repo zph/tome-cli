@@ -6,5 +6,15 @@
 #   <arg2> - The second argument
 # EXAMPLES:
 #   foo.sh 1 2
+# TOME_COMPLETION
 
-echo 1
+case $1 in
+  --completion)
+    echo -e "--help\\tHelp message for foo\\n"
+    echo -e "--query\\tQuery message for foo\\n"
+    echo -e "an-argument\\tArgument\\n"
+    ;;
+  *)
+    echo 1
+    ;;
+esac
