@@ -1,3 +1,23 @@
+- semver: 0.0.3
+  date: 2024-08-03T09:50:44-07:00
+  packager: Zander Hill <zander@xargs.io>
+  changes:
+    - commit: 182d0f132806750f093cbe235a45b95647bb8f2a
+      note: Update changelog
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 0e6861726baa0e07d9c2d36a98d79837092b25a0
+      note: Update makefile
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
 - semver: 0.0.2
   date: 2024-08-03T09:30:39-07:00
   packager: Zander Hill <zander@xargs.io>
