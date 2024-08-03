@@ -46,16 +46,16 @@ tome completion zsh
 - [x] Use https://github.com/spf13/cobra/blob/main/site/content/completions/_index.md#creating-your-own-completion-command
       to override and rename from tome-cli to whatever the binary name is on their system
 - [x] add tome compatibility layer for transition or include shell script shim
+- [x] Setup changelog tooling ([chglog init](https://github.com/goreleaser/chglog))
+- [x] Respects a .gitignore type file in root of project to determine what to complete/execute (https://github.com/sabhiram/go-gitignore)
+- [x] auto-complete script arguments (scripts that include the text TOME_COMPLETION which are tab completed will try to get autocompletes from the script via executing it with --completion)
+- [x] injects TOME_ROOT into tooling as env var and TOME_EXECUTABLE
+- [x] Add level and k/v style logging
 - [ ] Add instructions to README
 - [ ] Generate a docs folder for more full instructions (https://umarcor.github.io/cobra/#generating-markdown-docs-for-your-own-cobracommand)
-- [ ] Setup changelog tooling ([chglog init](https://github.com/goreleaser/chglog))
-- [ ] Respects a .gitignore type file in root of project to determine what to complete/execute (https://github.com/sabhiram/go-gitignore)
-- [x] auto-complete script arguments (scripts that include the text TOME_COMPLETION which are tab completed will try to get autocompletes from the script via executing it with --completion)
+- [ ] See if there's utility in ActiveHelp https://umarcor.github.io/cobra/#active-help
 - [ ] pre-hooks (hooks.d folder will be sourced in order or executed before the real script)
   - [ ] https://umarcor.github.io/cobra/#prerun-and-postrun-hooks
-- [x] injects TOME_ROOT into tooling as env var and TOME_EXECUTABLE
-- [ ] See if there's utility in ActiveHelp https://umarcor.github.io/cobra/#active-help
-- [ ] for hooks we can use the following though post runs won't work alongside our exec pattern
 ```
 	// The *Run functions are executed in the following order:
 	//   * PersistentPreRun()
@@ -64,7 +64,6 @@ tome completion zsh
 	//   * PostRun()
 	//   * PersistentPostRun()
 ```
-- [x] Add level and k/v style logging
 
 ## Non Features
 

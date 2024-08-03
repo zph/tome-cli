@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/gobeam/stringy"
+	gitignore "github.com/sabhiram/go-gitignore"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -104,6 +105,22 @@ type Config struct {
 
 func NewConfig() *Config {
 	return &Config{}
+}
+
+func (c *Config) IgnorePatterns() *gitignore.GitIgnore {
+	tomeIgnore := ".tome_ignore"
+	tomeIgnorePath := filepath.Join(c.RootDir(), tomeIgnore)
+	_, err := os.Stat(tomeIgnorePath)
+	if err == nil {
+		var txt []byte
+		txt, err = os.ReadFile(tomeIgnorePath)
+		if err != nil {
+			fmt.Printf(`Failed to read tome ignore file`)
+			os.Exit(1)
+		}
+		return gitignore.CompileIgnoreLines(strings.Split(string(txt), "\n")...)
+	}
+	return gitignore.CompileIgnoreLines()
 }
 
 func (c *Config) EnvVarWithSuffix(suffix string) (string, bool) {

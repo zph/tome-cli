@@ -19,6 +19,7 @@ import (
 func ValidArgsFunctionForScripts(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	config := NewConfig()
 	rootDir := config.RootDir()
+	ignorePatterns := config.IgnorePatterns()
 
 	if debug {
 		cobra.CompDebugln(fmt.Sprintf(`completion: args=%+v, toComplete=%s`, args, toComplete), true)
@@ -33,6 +34,9 @@ func ValidArgsFunctionForScripts(cmd *cobra.Command, args []string, toComplete s
 		}
 		argsAccumulator = append(argsAccumulator, arg)
 		joint := path.Join(append([]string{rootDir}, argsAccumulator...)...)
+		if ignorePatterns.MatchesPath(joint) {
+			continue
+		}
 		f, err := os.Stat(joint)
 		if debug {
 			cobra.CompDebugln(fmt.Sprintf(`completion: joint=%s`, joint), true)

@@ -2,6 +2,11 @@ import { assertSnapshot } from "jsr:@std/testing@0.225.3/snapshot";
 import { assertEquals, assertStringIncludes } from "jsr:@std/assert";
 import { $ } from "jsr:@david/dax"
 
+/*
+ * TODO
+ * - Add tests for compatibility mode
+ * - Add tests for tome_ignore behavior
+*/
 const env = {
   TOME_ROOT: "examples",
   PATH: "bin:" + Deno.env.get("PATH"),
@@ -44,7 +49,6 @@ for await (let [executable, fn] of [["tome-cli", tome], ["wrapper.sh", wrapper]]
 
   Deno.test(`completion`, async function (t): Promise<void> {
     const { out, asKeyVal } = await fn("__complete exec fo");
-    console.log(out)
     assertEquals(asKeyVal.slice(0, 2), [
       ["folder", "directory"],
       ["foo", "<arg1> <arg2>"],

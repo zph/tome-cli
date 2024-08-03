@@ -142,6 +142,7 @@ var helpCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		config := NewConfig()
 		rootDir := config.RootDir()
+		ignorePatterns := config.IgnorePatterns()
 		if len(args) == 0 {
 			allExecutables := []string{}
 			fn := func(path string, info fs.FileInfo, err error) error {
@@ -151,7 +152,7 @@ var helpCmd = &cobra.Command{
 				if info.IsDir() {
 					return nil
 				}
-				if isExecutableByOwner(info.Mode()) {
+				if isExecutableByOwner(info.Mode()) && !ignorePatterns.MatchesPath(path) {
 					allExecutables = append(allExecutables, path)
 				}
 				return nil
