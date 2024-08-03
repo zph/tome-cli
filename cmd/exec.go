@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"path/filepath"
 	"strings"
 	"syscall"
 
@@ -179,8 +180,18 @@ func ExecRunE(cmd *cobra.Command, args []string) error {
 		os.Exit(1)
 	}
 
+	absRootDir, err := filepath.Abs(config.RootDir())
+	if err != nil {
+		fmt.Printf("Error getting absolute path for root dir: %v\n", err)
+		os.Exit(1)
+	}
+
+	envs := os.Environ()
+	envs = append(envs, fmt.Sprintf("TOME_ROOT=%s", absRootDir))
+	envs = append(envs, fmt.Sprintf("TOME_EXECUTABLE=%s", config.ExecutableName()))
+
 	args = append([]string{maybeFile}, maybeArgs...)
-	err := syscall.Exec(maybeFile, args, os.Environ())
+	err = syscall.Exec(maybeFile, args, envs)
 	// Exec should create new process, so we should never get here except on error
 	if err != nil {
 		fmt.Printf("Error executing command: %v\n", err)

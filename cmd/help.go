@@ -81,8 +81,6 @@ func (s *Script) parse() error {
 
 		s.usage = strings.TrimSpace(strings.Split(lines[linesStart], UsageKey)[1])
 		s.help = helpText
-	} else {
-		fmt.Println("No help available")
 	}
 	return nil
 }

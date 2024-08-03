@@ -37,8 +37,8 @@ tome completion zsh
 - [x] cross compilation via goreleaser
 - [o] test harness for the commands
   - [x] bats harness for shell code
+  - [x] e2e tests wrapped in deno unit tests
   - [ ] cobra testing for commands
-  - [ ] tests based on simulated fs
 - [x] supports aliasing tool to shorthand name
 - [x] Determines root folder based on:
         1. cli flag
@@ -50,10 +50,10 @@ tome completion zsh
 - [ ] Generate a docs folder for more full instructions (https://umarcor.github.io/cobra/#generating-markdown-docs-for-your-own-cobracommand)
 - [ ] Setup changelog tooling ([chglog init](https://github.com/goreleaser/chglog))
 - [ ] Respects a .gitignore type file in root of project to determine what to complete/execute (https://github.com/sabhiram/go-gitignore)
-- [ ] auto-complete script arguments
+- [x] auto-complete script arguments (scripts that include the text TOME_COMPLETION which are tab completed will try to get autocompletes from the script via executing it with --completion)
 - [ ] pre-hooks (hooks.d folder will be sourced in order or executed before the real script)
   - [ ] https://umarcor.github.io/cobra/#prerun-and-postrun-hooks
-- [ ] injects TOME_ROOT into tooling as env var (but could inject as MY_COMMAND_ROOT if users have multiple tome-cli running)
+- [x] injects TOME_ROOT into tooling as env var and TOME_EXECUTABLE
 - [ ] See if there's utility in ActiveHelp https://umarcor.github.io/cobra/#active-help
 - [ ] for hooks we can use the following though post runs won't work alongside our exec pattern
 ```

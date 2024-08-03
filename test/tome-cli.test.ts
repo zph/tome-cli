@@ -22,6 +22,7 @@ Deno.test("top level help", async function (t): Promise<void> {
   const { lines } = await tome("help");
   assertEquals(lines, [
     "folder bar: <arg1> <arg2>",
+    "folder test-env-injection: ",
     "foo: <arg1> <arg2>",
   ]);
 });
@@ -67,5 +68,14 @@ Deno.test("completion nested script arguments does not execute script if not imp
   await assertEquals(lines, [
     ":4",
     "Completion ended with directive: ShellCompDirectiveNoFileComp",
+  ]);
+});
+
+Deno.test("injects TOME_ROOT and TOME_EXECUTABLE into environment of script", async function (t): Promise<void> {
+  const {code, lines} = await tome(`exec folder test-env-injection`);
+  assertEquals(code, 0);
+  await assertEquals(lines.filter(l => l.startsWith("TOME_")), [
+    `TOME_ROOT=${Deno.env.get("PWD")}/examples`,
+    "TOME_EXECUTABLE=tome-cli",
   ]);
 });
