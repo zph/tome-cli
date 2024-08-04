@@ -42,3 +42,4 @@ tag:
 changelog:
 	chglog init
 	chglog format --template repo > CHANGELOG.md
+	go run main.go docs && git add docs
