@@ -37,6 +37,7 @@ run: build
 
 tag:
 	git tag v$(shell cat VERSION)
+	git push origin main
 	git push origin v$(shell cat VERSION)
 	# This works with versions while add --version isn't
 	chglog init
