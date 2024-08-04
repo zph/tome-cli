@@ -13,9 +13,6 @@ jobs:
         with:
           fetch-depth: 0
       - uses: cashapp/activate-hermit@v1
-        with:
-          cache: "true"
-          working-directory: ".hermit"
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v3
         with:

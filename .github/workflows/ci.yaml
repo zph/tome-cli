@@ -13,9 +13,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - uses: cashapp/activate-hermit@v1
-        with:
-          cache: "true"
-          working-directory: ".hermit"
       - name: Run go test
         run: make test-go
       - name: E2E test
