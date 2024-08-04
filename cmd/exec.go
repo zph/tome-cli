@@ -111,7 +111,7 @@ var execCmd = &cobra.Command{
 var dryRun bool
 
 func init() {
-	execCmd.Flags().BoolVarP(&dryRun, "dry-run", "d", false, "Dry run the exec command")
+	execCmd.Flags().BoolVar(&dryRun, "dry-run", false, "Dry run the exec command")
 	viper.BindPFlag("dry-run", execCmd.Flags().Lookup("dry-run"))
 	rootCmd.AddCommand(execCmd)
 }

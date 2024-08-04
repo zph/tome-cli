@@ -16,7 +16,7 @@ Usage:
 Available Commands:
   alias       Create an alias wrapper for tome-cli
   completion  Generate completion script
-  exec        executes a script
+  exec        executes a script from tome root
   help        help displays the usage and help text for a script
 
 Flags:
@@ -55,7 +55,7 @@ Usage:
 Available Commands:
   alias       Create an alias wrapper for tome-cli
   completion  Generate completion script
-  exec        executes a script
+  exec        executes a script from tome root
   help        help displays the usage and help text for a script
 
 Flags:
