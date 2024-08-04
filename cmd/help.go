@@ -4,13 +4,9 @@ Copyright © 2024 Zander Hill <zander@xargs.io>
 package cmd
 
 import (
-	"fmt"
 	"io/fs"
-	"os"
 	"path"
 	"path/filepath"
-	"regexp"
-	"strings"
 
 	"github.com/lithammer/dedent"
 	"github.com/spf13/cobra"
@@ -18,127 +14,31 @@ import (
 
 var UsageKey = "USAGE: "
 
-func isExecutableByOwner(mode os.FileMode) bool {
-	return mode&0100 != 0
-}
-
-type Script struct {
-	path  string
-	usage string
-	help  string
-	root  string
-}
-
-func (s *Script) HasCompletions() bool {
-	body, err := os.ReadFile(s.path)
-	if err != nil {
-		return false
-	}
-	return strings.Contains(string(body), "TOME_COMPLETION")
-}
-
-func (s *Script) IsDir() bool {
-	fileInfo, err := os.Stat(s.path)
-	if err != nil {
-		fmt.Printf("Error checking file %s: %v\n", s.path, err)
-	}
-	return fileInfo.IsDir()
-}
-
-func (s *Script) IsExecutable() bool {
-	fileInfo, err := os.Stat(s.path)
-	if err != nil {
-		fmt.Printf("Error checking file %s: %v\n", s.path, err)
-	}
-	return isExecutableByOwner(fileInfo.Mode())
-}
-
-func (s *Script) parse() error {
-	b, err := os.ReadFile(s.path)
-	if err != nil {
-		return err
-	}
-
-	if strings.Contains(string(b), UsageKey) {
-		lines := strings.Split(string(b), "\n")
-		var linesStart int
-		for idx, line := range lines {
-			if strings.Contains(line, UsageKey) {
-				linesStart = idx
-				break
-			}
-		}
-
-		var helpEnds int
-		for idx, line := range lines[linesStart:] {
-			if line == "" {
-				helpEnds = idx + linesStart
-				break
-			}
-		}
-		helpTextLines := lines[linesStart:helpEnds]
-		helpText := strings.Join(helpTextLines, "\n")
-
-		s.usage = strings.TrimSpace(strings.Split(lines[linesStart], UsageKey)[1])
-		s.help = helpText
-	}
-	return nil
-}
-
-// Usage returns the usage string for the script
-// after stripping out the script name or $0
-// this is done to reduce visual noise
-func (s *Script) Usage() string {
-	baseUsage := s.usage
-	prefixes := []string{"$0", filepath.Base(s.path)}
-	for _, prefix := range prefixes {
-		baseUsage = strings.TrimPrefix(baseUsage, prefix)
-	}
-	baseUsage = strings.TrimSpace(baseUsage)
-	return dedent.Dedent(baseUsage)
-}
-
-func (s *Script) Help() string {
-	lines := strings.Split(s.help, "\n")
-	var helpTextLines []string
-	toTrim := []string{"#", "//", "/\\*", "\\*/", "--"}
-	toTrimRegex := regexp.MustCompile(fmt.Sprintf("^(%s)+", strings.Join(toTrim, "|")))
-	for _, line := range lines {
-		helpTextLines = append(helpTextLines, toTrimRegex.ReplaceAllString(line, ""))
-	}
-	return dedent.Dedent(strings.Join(helpTextLines, "\n"))
-}
-
-func (s *Script) PathWithoutRoot() string {
-	return strings.TrimPrefix(strings.TrimPrefix(s.path, s.root), string(filepath.Separator))
-}
-
-func (s *Script) PathSegments() []string {
-	return strings.Split(s.PathWithoutRoot(), string(filepath.Separator))
-}
-
-func (s *Script) PrintUsage() {
-	fmt.Printf("%s: %s\n", strings.Join(s.PathSegments(), " "), s.Usage())
-}
-
-// PrintHelp prints the full help text for the script
-// Help is inclusive of Usage and does not strip out
-// the script name or $0
-// TODO: consider stripping out leading comment characters such as #, //, etc
-func (s *Script) PrintHelp() {
-	fmt.Printf("%s\n---\n%s\n", strings.Join(s.PathSegments(), " "), s.Help())
-}
-
-func NewScript(path string, root string) *Script {
-	s := &Script{path: path, root: root}
-	s.parse()
-	return s
-}
-
 // helpCmd represents the help command
 var helpCmd = &cobra.Command{
 	Use:   "help",
 	Short: "help displays the usage and help text for a script",
+	Long: dedent.Dedent(`
+	The help command extracts the usage and help text from a script file and displays it to the user.
+
+	Help text is extracted from the script file by searching for the first line that includes "USAGE: ".
+
+	When printing long form help text, the help command will print the help text from the script file
+  starting from the line after the "USAGE: " line and ending on the first blank line.
+
+	Example: (more can be found in the examples directory)
+
+	#!/bin/bash
+	# USAGE: script.sh [options] <arg1> <arg2>
+	# This is the help text for the script
+	# It can span multiple lines
+	# and will be displayed to the user when they run "tome-cli help script.sh"
+
+	echo 1
+
+	In this example the USAGE line is "USAGE: script.sh [options] <arg1> <arg2>"
+	The help text is the lines following the USAGE line until the first blank line.
+	`),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		config := NewConfig()
 		rootDir := config.RootDir()

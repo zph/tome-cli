@@ -2,6 +2,30 @@
 
 help displays the usage and help text for a script
 
+### Synopsis
+
+
+	The help command extracts the usage and help text from a script file and displays it to the user.
+
+	Help text is extracted from the script file by searching for the first line that includes "USAGE: ".
+
+	When printing long form help text, the help command will print the help text from the script file
+  starting from the line after the "USAGE: " line and ending on the first blank line.
+
+	Example: (more can be found in the examples directory)
+
+	#!/bin/bash
+	# USAGE: script.sh [options] <arg1> <arg2>
+	# This is the help text for the script
+	# It can span multiple lines
+	# and will be displayed to the user when they run "tome-cli help script.sh"
+
+	echo 1
+
+	In this example the USAGE line is "USAGE: script.sh [options] <arg1> <arg2>"
+	The help text is the lines following the USAGE line until the first blank line.
+
+
 ```
 tome-cli help [flags]
 ```

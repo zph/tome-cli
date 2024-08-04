@@ -3,8 +3,10 @@ BINARY=bin/tome-cli
 all: build test
 
 build: $(BINARY)
+GO_FILES = $(shell find . -name '*.go' | grep -v /vendor/)
+EMBED_FILES = $(shell find . -name '*.tmpl' | grep -v /vendor/)
 
-$(BINARY): $(shell find . -name '*.go')
+$(BINARY): $(GO_FILES) $(EMBED_FILES)
 	go build -o bin/tome-cli
 
 clean:
@@ -43,3 +45,6 @@ changelog:
 	chglog init
 	chglog format --template repo > CHANGELOG.md
 	go run main.go docs && git add docs
+
+docs: $(GO_FILES)
+	go run main.go docs

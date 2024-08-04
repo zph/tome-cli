@@ -50,10 +50,6 @@
       committer:
         name: Zander Hill
         email: zander@xargs.io
-- semver: 0.0.1
-  date: 2024-08-03T09:17:08-07:00
-  packager: Zander Hill <zander@xargs.io>
-  changes:
     - commit: 40d37218726b1bd967dd1a719ec0307df2ece5fc
       note: Inject TOME_ROOT and TOME_EXECUTABLE into context of scripts
       author:

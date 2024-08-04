@@ -18,11 +18,6 @@
 2024-08-03
 
 * Add changelog (b64a4d1b)
-
-0.0.1
-=============
-2024-08-03
-
 * Inject TOME_ROOT and TOME_EXECUTABLE into context of scripts (40d37218)
 * Enable script arguments auto completion (6663f167)
 * Update README (b5a64ad1)
