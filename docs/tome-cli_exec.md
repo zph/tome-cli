@@ -1,6 +1,18 @@
 ## tome-cli exec
 
-executes a script
+executes a script from tome root
+
+### Synopsis
+
+
+		The exec command executes a script file with the provided arguments.
+
+		The exec command will search for the script file in the root directory
+	  specified in the tome configuration flags or env vars.
+
+		Scripts are searched for in the root directory and subdirectories and
+		then are called with execvp to replace the current process.
+
 
 ```
 tome-cli exec [flags]
@@ -9,7 +21,8 @@ tome-cli exec [flags]
 ### Options
 
 ```
-  -h, --help   help for exec
+      --dry-run   Dry run the exec command
+  -h, --help      help for exec
 ```
 
 ### Options inherited from parent commands
