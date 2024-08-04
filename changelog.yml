@@ -1,3 +1,111 @@
+- semver: 0.0.5
+  date: 2024-08-03T18:35:52-07:00
+  packager: Zander Hill <zander@xargs.io>
+  changes:
+    - commit: 22f9d4dc878fe3457d9c5bf76ce19c05402dc590
+      note: v0.0.5
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 323293851b4ea21d3f6b99e84c8247d5e7e42788
+      note: Add docs
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 99603386b29a413dc901bd6ddeaff29497f6fab7
+      note: Add dry-run mode to exec
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 5b757d5bd359a77dc31c8279a9750b8173c704a2
+      note: Update test snapshots
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: c0e8977eb4b7cb0cd3986905b7db916bb2b1e2b6
+      note: Relocate commands
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 6b622474525d6a6a304f0dd7f582f4233d0355f9
+      note: Improve help texts help text
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 9433f45cc684aab87bcda26e88ad111d9492b498
+      note: Add docs
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 8366c5f3108fe94baa10e6b2992d48ebe1fb9170
+      note: Add docs
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 88acd234b0dad43ffee5c96551c8900d0e357ba6
+      note: Continue purging the evil of submodules
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 7716d7a2af87c44105835a0444662b006bb94358
+      note: Add tome_ignore behavior
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 705f547c6cbe0a950f64827cdd8f532950f5628e
+      note: Remove submodules as an exorcism of great evil
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 439e596aaac30b7c4d78b264d39984861b8f7473
+      note: Move tests away from bats for better control in deno
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 29586b93dc638067620511450399e49fa2c182ae
+      note: Bump changelog
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
 - semver: 0.0.4
   date: 2024-08-03T09:58:35-07:00
   packager: Zander Hill <zander@xargs.io>

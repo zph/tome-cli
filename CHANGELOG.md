@@ -1,4 +1,22 @@
 
+0.0.5
+=============
+2024-08-04
+
+* v0.0.5 (22f9d4dc)
+* Add docs (32329385)
+* Add dry-run mode to exec (99603386)
+* Update test snapshots (5b757d5b)
+* Relocate commands (c0e8977e)
+* Improve help texts help text (6b622474)
+* Add docs (9433f45c)
+* Add docs (8366c5f3)
+* Continue purging the evil of submodules (88acd234)
+* Add tome_ignore behavior (7716d7a2)
+* Remove submodules as an exorcism of great evil (705f547c)
+* Move tests away from bats for better control in deno (439e596a)
+* Bump changelog (29586b93)
+
 0.0.4
 =============
 2024-08-03
