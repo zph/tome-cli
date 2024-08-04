@@ -94,9 +94,9 @@ for await (let [executable, fn] of [["tome-cli", tome], ["wrapper.sh", wrapper]]
   Deno.test(`${executable}: injects TOME_ROOT and TOME_EXECUTABLE into environment of script`, async function (t): Promise<void> {
     const { code, lines, executable } = await fn(`exec folder test-env-injection`);
     assertEquals(code, 0);
-    await assertEquals(lines.filter(l => l.startsWith("TOME_ROOT=") || l.startsWith("TOME_EXECUTABLE=")), [
+    await assertEquals(lines.filter(l => l.startsWith("TOME_ROOT=") || l.startsWith("TOME_EXECUTABLE=")).sort(), [
       `TOME_ROOT=${Deno.env.get("PWD")}/examples`,
       `TOME_EXECUTABLE=${executable}`,
-    ]);
+    ].sort());
   });
 }
