@@ -1,10 +1,11 @@
-name: ci
-
+name: Test
 on:
+  # # Indicates I want to run this workflow on all branches, PR, and tags
   push:
-    tags:
-      - 'v*'
-
+    branches: ["master"]
+    tags: ["v*"]
+  pull_request:
+    branches: [ "master" ]
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -18,24 +19,3 @@ jobs:
         run: make test-go
       - name: E2E test
         run: make test-e2e
-  goreleaser:
-    depends-on: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - uses: cashapp/activate-hermit@v1
-        with:
-          cache: "true"
-      - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v3
-        with:
-          distribution: goreleaser
-          version: latest
-          args: release --rm-dist
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  - uses: actions/checkout@v3
