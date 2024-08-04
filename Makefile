@@ -21,10 +21,10 @@ deps: deps-chlogs
 
 test: test-go test-e2e
 
-test/wrapper.sh: build
+test/bin/wrapper.sh: build
 	@ $(BINARY) --executable wrapper.sh --root examples alias --output test/bin/wrapper.sh
 
-test-e2e: test/wrapper.sh build
+test-e2e: test/bin/wrapper.sh build
 	@ deno test --allow-env --allow-read --allow-run test/*.ts
 
 test-go:
