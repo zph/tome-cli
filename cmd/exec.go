@@ -72,7 +72,7 @@ func ExecRunE(cmd *cobra.Command, args []string) error {
 		os.Exit(1)
 	}
 
-	envs := os.Environ()
+	envs := []string{}
 	envs = append(envs, fmt.Sprintf("TOME_ROOT=%s", absRootDir))
 	envs = append(envs, fmt.Sprintf("TOME_EXECUTABLE=%s", config.ExecutableName()))
 
@@ -82,13 +82,23 @@ func ExecRunE(cmd *cobra.Command, args []string) error {
 	envs = append(envs, fmt.Sprintf("%s_EXECUTABLE=%s", executableAsEnvPrefix, config.ExecutableName()))
 
 	args = append([]string{maybeFile}, maybeArgs...)
-	err = syscall.Exec(maybeFile, args, envs)
+	execOrLog(maybeFile, args, envs)
+	return nil
+}
+
+func execOrLog(arv0 string, argv []string, env []string) {
+	if dryRun {
+		fmt.Printf("Would have executed:\nbinary: %s\nargs: %+v\nenv (injected):\n%+v\n", arv0, strings.Join(argv, " "), strings.Join(env, "\n"))
+		return
+	}
+	mergedEnv := append(os.Environ(), env...)
+
+	err := syscall.Exec(arv0, argv, mergedEnv)
 	// Exec should create new process, so we should never get here except on error
 	if err != nil {
 		fmt.Printf("Error executing command: %v\n", err)
 		os.Exit(1)
 	}
-	return nil
 }
 
 // execCmd represents the exec command
