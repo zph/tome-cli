@@ -12,7 +12,8 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - uses: cashapp/activate-hermit@v1
+      - name: Setup hermit
+        run: source .hermit/bin/activate-hermit
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v3
         with:

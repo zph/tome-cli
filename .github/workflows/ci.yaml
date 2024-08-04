@@ -12,7 +12,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - uses: cashapp/activate-hermit@v1
+      - name: Setup hermit
+        run: source .hermit/bin/activate-hermit
       - name: Run go test
         run: make test-go
       - name: E2E test
