@@ -48,3 +48,6 @@ changelog:
 
 docs: $(GO_FILES)
 	go run main.go docs
+
+release: clean build test
+	goreleaser release --clean --verbose
