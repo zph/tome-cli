@@ -21,7 +21,7 @@ deps: deps-chlogs
 	git submodule init
 	git submodule update
 
-test: test-go test-e2e
+test: build test-go test-e2e
 
 test/bin/wrapper.sh: build
 	@ $(BINARY) --executable wrapper.sh --root examples alias --output test/bin/wrapper.sh

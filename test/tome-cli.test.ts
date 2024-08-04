@@ -15,7 +15,7 @@ const env = {
 const envWrapper = {
   TOME_ROOT: "examples",
   TOME_EXECUTABLE: "wrapper.sh",
-  PATH: "test/bin:" + Deno.env.get("PATH"),
+  PATH: "test/bin:bin:" + Deno.env.get("PATH"),
 }
 
 const wrapper = async (args: string) => {
