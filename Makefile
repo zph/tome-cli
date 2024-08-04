@@ -18,8 +18,6 @@ deps-chlogs:
 
 deps: deps-chlogs
 	go mod tidy
-	git submodule init
-	git submodule update
 
 test: build test-go test-e2e
 

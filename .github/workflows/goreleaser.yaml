@@ -15,8 +15,8 @@ jobs:
         with:
           working-directory: .hermit
           cache: "true"
-      - name: Setup hermit
-        run: source .hermit/bin/activate-hermit
+      - name: Install deps
+        run: make deps
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v3
         with:
