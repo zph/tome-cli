@@ -7,7 +7,10 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/gobeam/stringy"
 	"github.com/lithammer/dedent"
+	gitignore "github.com/sabhiram/go-gitignore"
+	"github.com/spf13/viper"
 )
 
 func isExecutableByOwner(mode os.FileMode) bool {
@@ -125,4 +128,51 @@ func NewScript(path string, root string) *Script {
 	s := &Script{path: path, root: root}
 	s.parse()
 	return s
+}
+
+type Config struct {
+}
+
+func NewConfig() *Config {
+	return &Config{}
+}
+
+func (c *Config) IgnorePatterns() *gitignore.GitIgnore {
+	tomeIgnore := ".tome_ignore"
+	tomeIgnorePath := filepath.Join(c.RootDir(), tomeIgnore)
+	_, err := os.Stat(tomeIgnorePath)
+	if err == nil {
+		var txt []byte
+		txt, err = os.ReadFile(tomeIgnorePath)
+		if err != nil {
+			fmt.Printf(`Failed to read tome ignore file`)
+			os.Exit(1)
+		}
+		return gitignore.CompileIgnoreLines(strings.Split(string(txt), "\n")...)
+	}
+	return gitignore.CompileIgnoreLines()
+}
+
+func (c *Config) EnvVarWithSuffix(suffix string) (string, bool) {
+	prefix := stringy.New(executableName).SnakeCase().Get()
+	val := os.Getenv(strings.ToUpper(prefix) + "_" + strings.ToUpper(suffix))
+	ok := val != ""
+
+	return val, ok
+}
+
+func (c *Config) EnvVarOrViperValue(val string) string {
+	v, ok := c.EnvVarWithSuffix(val)
+	if ok {
+		return v
+	}
+	return viper.GetViper().GetString(val)
+}
+
+func (c *Config) RootDir() string {
+	return c.EnvVarOrViperValue("root")
+}
+
+func (c *Config) ExecutableName() string {
+	return c.EnvVarOrViperValue("executable")
 }

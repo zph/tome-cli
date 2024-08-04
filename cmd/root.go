@@ -7,10 +7,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/gobeam/stringy"
-	gitignore "github.com/sabhiram/go-gitignore"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -94,51 +92,4 @@ func initConfig() {
 	// it is set to support multiple instances of the cli
 	v.SetEnvPrefix("TOME") // will be uppercased automatically
 	v.AutomaticEnv()       // read in environment variables that match
-}
-
-type Config struct {
-}
-
-func NewConfig() *Config {
-	return &Config{}
-}
-
-func (c *Config) IgnorePatterns() *gitignore.GitIgnore {
-	tomeIgnore := ".tome_ignore"
-	tomeIgnorePath := filepath.Join(c.RootDir(), tomeIgnore)
-	_, err := os.Stat(tomeIgnorePath)
-	if err == nil {
-		var txt []byte
-		txt, err = os.ReadFile(tomeIgnorePath)
-		if err != nil {
-			fmt.Printf(`Failed to read tome ignore file`)
-			os.Exit(1)
-		}
-		return gitignore.CompileIgnoreLines(strings.Split(string(txt), "\n")...)
-	}
-	return gitignore.CompileIgnoreLines()
-}
-
-func (c *Config) EnvVarWithSuffix(suffix string) (string, bool) {
-	prefix := stringy.New(executableName).SnakeCase().Get()
-	val := os.Getenv(strings.ToUpper(prefix) + "_" + strings.ToUpper(suffix))
-	ok := val != ""
-
-	return val, ok
-}
-
-func (c *Config) EnvVarOrViperValue(val string) string {
-	v, ok := c.EnvVarWithSuffix(val)
-	if ok {
-		return v
-	}
-	return viper.GetViper().GetString(val)
-}
-
-func (c *Config) RootDir() string {
-	return c.EnvVarOrViperValue("root")
-}
-
-func (c *Config) ExecutableName() string {
-	return c.EnvVarOrViperValue("executable")
 }
