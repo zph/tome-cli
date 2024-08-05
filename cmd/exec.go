@@ -55,8 +55,7 @@ func ExecRunE(cmd *cobra.Command, args []string) error {
 			continue
 		}
 
-		if fileInfo.Mode()&0111 != 0 {
-			// Found an executable file
+		if isExecutableByOwner(fileInfo.Mode()) {
 			executable = maybeFile
 			break
 		}
@@ -88,7 +87,7 @@ func ExecRunE(cmd *cobra.Command, args []string) error {
 
 func execOrLog(arv0 string, argv []string, env []string) {
 	if dryRun {
-		fmt.Printf("Would have executed:\nbinary: %s\nargs: %+v\nenv (injected):\n%+v\n", arv0, strings.Join(argv, " "), strings.Join(env, "\n"))
+		fmt.Printf("dry run:\nbinary: %s\nargs: %+v\nenv (injected):\n%+v\n", arv0, strings.Join(argv, " "), strings.Join(env, "\n"))
 		return
 	}
 	mergedEnv := append(os.Environ(), env...)

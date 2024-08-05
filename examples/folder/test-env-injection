@@ -1,3 +1,11 @@
 #!/bin/bash
+# TOME_COMPLETION
 
-env
+case $1 in
+  --completion)
+    env
+    ;;
+  *)
+    env
+    ;;
+esac

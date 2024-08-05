@@ -70,6 +70,12 @@ for await (let [executable, fn] of [["tome-cli", tome], ["wrapper.sh", wrapper]]
     await assertStringIncludes(out, "--help");
   });
 
+  Deno.test(`completion for nested scripts in directory`, async function (t): Promise<void> {
+    const { out } = await fn(`__complete exec folder ""`);
+    await assertStringIncludes(out, "test-env-injection")
+    await assertStringIncludes(out, "bar")
+  });
+
   Deno.test(`completion nested script arguments if they implement --completion`, async function (t): Promise<void> {
     const { lines } = await fn(`__complete exec foo ""`);
     await assertEquals(lines, [
@@ -100,3 +106,11 @@ for await (let [executable, fn] of [["tome-cli", tome], ["wrapper.sh", wrapper]]
     ].sort());
   });
 }
+
+Deno.test(`tome-cli: TOME_COMPLETION passed through as env`, async function (t): Promise<void> {
+  const { code, lines, executable } = await tome(`__complete exec folder test-env-injection ""`);
+  assertEquals(code, 0);
+  await assertEquals(lines.filter(l => l.startsWith("TOME_COMPLETION")).sort(), [
+    'TOME_COMPLETION={"args":["folder","test-env-injection"],"current_word":""}',
+  ].sort());
+})

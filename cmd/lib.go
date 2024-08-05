@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -14,6 +15,11 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
+
+type CompletionArgs struct {
+	Args        []string `json:"args"`
+	CurrentWord string   `json:"current_word"`
+}
 
 func ValidArgsFunctionForScripts(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	config := NewConfig()
@@ -53,7 +59,7 @@ func ValidArgsFunctionForScripts(cmd *cobra.Command, args []string, toComplete s
 				cobra.CompDebugln(fmt.Sprintf(`completion: hasCompletions=%t`, s.HasCompletions()), true)
 			}
 			if !s.HasCompletions() {
-				return nil, cobra.ShellCompDirectiveNoFileComp
+				continue
 			}
 
 			/*
@@ -61,7 +67,16 @@ func ValidArgsFunctionForScripts(cmd *cobra.Command, args []string, toComplete s
 			*/
 			// Execute the joint path as a shell script
 			completionFlag := []string{"--completion"}
-			output, err := exec.Command(joint, completionFlag...).Output()
+			cmd := exec.Command(joint, completionFlag...)
+			envArg := CompletionArgs{Args: args, CurrentWord: toComplete}
+			c, err := json.Marshal(envArg)
+			if err != nil {
+				log.Fatal(err)
+				os.Exit(1)
+			}
+			completionArg := fmt.Sprintf(`TOME_COMPLETION=%s`, c)
+			cmd.Env = append(cmd.Environ(), completionArg)
+			output, err := cmd.CombinedOutput()
 			if debug {
 				cobra.CompDebugln(fmt.Sprintf(`completion: output=%s`, output), true)
 			}
@@ -90,20 +105,31 @@ func ValidArgsFunctionForScripts(cmd *cobra.Command, args []string, toComplete s
 		}
 	}
 
+	if debug {
+		cobra.CompDebugln(fmt.Sprintf(`completion: argsAccumulator=%+v`, argsAccumulator), true)
+	}
 	// Otherwise we're completing the path to the script
 	fullPathSegments := append([]string{rootDir}, args...)
 	fullPath := path.Join(fullPathSegments...)
 
 	entries, err := os.ReadDir(fullPath)
-	if err != nil {
-		return nil, cobra.ShellCompDirectiveError
-	}
+	// If there are no entries, we can't complete anything
+	// this intentionally returns no completions ahead
+	// TODO: should we check for if.IsDir() instead?
 	if len(entries) == 0 {
 		return nil, cobra.ShellCompDirectiveNoFileComp
 	}
-
+	if err != nil {
+		return nil, cobra.ShellCompDirectiveError
+	}
+	if debug {
+		cobra.CompDebugln(`completion: starting to complete entries`, true)
+	}
 	var toCompleteEntries []string
 	if toComplete == "" {
+		if debug {
+			cobra.CompDebugln(fmt.Sprintf(`completion: entries %+v`, entries), true)
+		}
 		for _, entry := range entries {
 			toCompleteEntries = append(toCompleteEntries, entry.Name())
 		}

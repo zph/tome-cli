@@ -35,7 +35,8 @@ Completion ended with directive: ShellCompDirectiveNoFileComp"
 `;
 
 snapshot[`completion nested script 1`] = `
-":4
+"bar	<arg1> <arg2>
+:4
 Completion ended with directive: ShellCompDirectiveNoFileComp"
 `;
 
@@ -74,6 +75,7 @@ Completion ended with directive: ShellCompDirectiveNoFileComp"
 `;
 
 snapshot[`completion nested script 2`] = `
-":4
+"bar	<arg1> <arg2>
+:4
 Completion ended with directive: ShellCompDirectiveNoFileComp"
 `;
