@@ -108,9 +108,9 @@ for await (let [executable, fn] of [["tome-cli", tome], ["wrapper.sh", wrapper]]
 }
 
 Deno.test(`tome-cli: TOME_COMPLETION passed through as env`, async function (t): Promise<void> {
-  const { code, lines, executable } = await tome(`__complete exec folder test-env-injection ""`);
+  const { code, lines, executable } = await tome(`__complete exec folder test-env-injection "a"`);
   assertEquals(code, 0);
   await assertEquals(lines.filter(l => l.startsWith("TOME_COMPLETION")).sort(), [
-    'TOME_COMPLETION={"args":["folder","test-env-injection"],"current_word":""}',
+    'TOME_COMPLETION={"args":["folder","test-env-injection"],"last_arg":"test-env-injection","current_word":"a"}',
   ].sort());
 })

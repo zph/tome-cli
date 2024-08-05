@@ -18,7 +18,16 @@ import (
 
 type CompletionArgs struct {
 	Args        []string `json:"args"`
+	LastArg     string   `json:"last_arg"`
 	CurrentWord string   `json:"current_word"`
+}
+
+func NewCompletionArgs(args []string, currentWord string) CompletionArgs {
+	return CompletionArgs{
+		Args:        args,
+		LastArg:     args[len(args)-1],
+		CurrentWord: currentWord,
+	}
 }
 
 func ValidArgsFunctionForScripts(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
@@ -68,7 +77,7 @@ func ValidArgsFunctionForScripts(cmd *cobra.Command, args []string, toComplete s
 			// Execute the joint path as a shell script
 			completionFlag := []string{"--completion"}
 			cmd := exec.Command(joint, completionFlag...)
-			envArg := CompletionArgs{Args: args, CurrentWord: toComplete}
+			envArg := NewCompletionArgs(args, toComplete)
 			c, err := json.Marshal(envArg)
 			if err != nil {
 				log.Fatal(err)
