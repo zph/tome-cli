@@ -46,7 +46,6 @@ See [docs](./docs/tome-cli.md) for expanded instructions
   - root folder's scripts
   - root script's flags and arguments (when they satisfy the --complete and TOME_COMPLETION interface)
 - Gitignore like syntax for ignoring scripts by using a `.tome_ignore` file at base of root folder
--
 
 # Capabilities
 
@@ -56,7 +55,7 @@ See [docs](./docs/tome-cli.md) for expanded instructions
 - [x] cross compilation via goreleaser
 - [o] test harness for the commands
   - [x] e2e tests wrapped in deno unit tests
-  - [ ] Add tests for backwards compatibility with prior tome
+  - [x] Add tests for backwards compatibility with prior tome
   - [ ] cobra testing for commands
 - [x] supports aliasing tool to shorthand name
 - [x] Determines root folder based on:

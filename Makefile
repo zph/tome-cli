@@ -40,7 +40,7 @@ tag:
 	# This works with versions while add --version isn't
 	chglog init
 
-changelog:
+changelog: $(GO_FILES)
 	chglog init
 	chglog format --template repo > CHANGELOG.md
 	go run main.go docs && git add docs
