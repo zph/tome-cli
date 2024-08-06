@@ -55,6 +55,18 @@ PowerShell:
   # To load completions for every new session, run:
   PS> %[1]s completion powershell > %[1]s.ps1
   # and source this file from your PowerShell profile.
+
+Using completions from within child scripts
+
+Once completions discover an executable and non-ignored script,
+tome-cli will check if the script has TOME_COMPLETION declared in file.
+If so, it will attempt fetch completions from the script itself.
+
+This is accomplished by passing --complete to the script and capturing the output.
+
+The output syntax is newline-separated strings where each line is composed of
+a completion (e.g. a flag or argument), a tab character, and a description of the completion.
+
 `, rootCmd.Name()),
 	DisableFlagsInUseLine: true,
 	ValidArgs:             []string{"bash", "zsh", "fish", "powershell"},

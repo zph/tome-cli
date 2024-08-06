@@ -105,13 +105,23 @@ var execCmd = &cobra.Command{
 	Use:   "exec",
 	Short: "executes a script from tome root",
 	Long: dedent.Dedent(`
-		The exec command executes a script file with the provided arguments.
+	Usage: tome-cli exec <path-to> <script> [args...]
 
-		The exec command will search for the script file in the root directory
-	  specified in the tome configuration flags or env vars.
+	The exec command executes a script file with the provided arguments.
 
-		Scripts are searched for in the root directory and subdirectories and
-		then are called with execvp to replace the current process.
+	The exec command will search for the script file in the root directory
+	specified in the tome configuration flags or env vars. Paths will be
+	joined with the root directory, the intervening directories, and
+	the script file name.
+
+	When executed, the script will be become the tome-cli process through
+	the syscall.Exec function.
+
+	TOME_ROOT and TOME_EXECUTABLE are injected into the environment as well
+	as the executable name as an uppercased snake case string.
+
+	If the executable name is 'kit' the additional environment variables would be:
+	KIT_ROOT, KIT_EXECUTABLE.
 		`),
 	RunE:              ExecRunE,
 	ValidArgsFunction: ValidArgsFunctionForScripts,

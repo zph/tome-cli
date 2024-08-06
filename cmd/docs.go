@@ -12,8 +12,11 @@ import (
 
 // docsCmd represents the docs command
 var docsCmd = &cobra.Command{
-	Use:    "docs",
-	Short:  "Create docs for tome-cli",
+	Use:   "docs",
+	Short: "Create docs for tome-cli",
+	Long: `The docs command generates markdown documentation for the tome-cli command.
+
+	It's hidden from the help menu because it's not a user-facing command.`,
 	Hidden: true,
 	Run: func(cmd *cobra.Command, args []string) {
 		err := doc.GenMarkdownTree(rootCmd, "docs")

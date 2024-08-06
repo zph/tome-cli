@@ -28,8 +28,24 @@ var aliasCmd = &cobra.Command{
 	Use:   "alias",
 	Short: "Create an alias wrapper for tome-cli",
 	Long: `The alias command allows you to create an alias for the tome command.
-This can be useful if you wish to embed common flags like root and executable name and alias the command as a different name.
-The generated script uses the executable name and root directory specified in the tome configuration file.`,
+
+The alias command allows you to create an alias for the tome command.
+
+An alias is a shell script that embeds common flags like root and executable
+name and can be stored as an alternate name.
+
+The generated script uses the executable name and root directory specified in the tome configuration file.
+
+To use it:
+
+	The following command will create an alias script in the ~/bin directory named 'kit'
+	which embeds the root directory and executable name so that 'kit' can be used in normal
+	circumstances with no flags or environment variables.
+
+  $> tome-cli --root $PWD/examples --executable kit alias --output ~/bin/kit
+
+Read the template script 'tome-wrapper.sh.tmpl' for more information on how the alias is created
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		config := NewConfig()
 		s := ScriptTemplate{
