@@ -1,3 +1,175 @@
+- semver: 0.1.0
+  date: 2024-08-05T20:02:51-07:00
+  packager: Zander Hill <zander@xargs.io>
+  changes:
+    - commit: 6f154c3382ca3f6154c7ca9800ad5276128719af
+      note: 0.1.0 release
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: cd1ca0512543193ab4c09b4a61233a29a3383a0d
+      note: 0.1.0-rc5
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: c0b23a0a1f31f73b8b53b7eb955ef0cc1750cd1d
+      note: Update documentation
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: e8178e83b79ecc7f6cdbe9849ff039d29b898c3b
+      note: Add convenience arg in the completion to simplify use in bash
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 6b294c865b937b4a5758183fc4c90f0c92f415f7
+      note: Inject TOME_COMPLETION json value that can be read in child script for completion decisions
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 4878735fe393463cbc6b1a30d3f2d36c222d2141
+      note: 0.1.0-rc4
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: bc0c0dfd1c6b6de68d4d58e902a5178f7d4070fe
+      note: 0.1.0-rc3
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 8921fb2123884acea6ba3601134be9150288cfde
+      note: fix goreleaser argument
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: d52092d1fdfd9f478aa0e23795e40822d14ee648
+      note: 0.1.0-rc2
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: d16abd18496deca61c5ae7471c14914bc50b1a18
+      note: 0.1.0-rc1
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 2045650384dbf1859110f2392ee2a07d3cb616b3
+      note: Enforce sorted orders in tests
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 060e5b9278b8ee4947a96bb247cc10f0c565f3ab
+      note: Fix PATH on ci
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 72d39ced3369ded345dfe755639f4e1a903311d3
+      note: Add hermit... to help github actions
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 434aa8f87f3e52e52420053bebee3ff814ce6870
+      note: Add hermit... to help github actions
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 09b81b7bc7b17985ff561c4d87a6bca432deda3f
+      note: Trying to fix github actions
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 2db47226b9f65a8cd55768075a99d5b68209738e
+      note: Trying to fix github actions
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 8336fa01890a61d95c3f0e58e0d4403fbc4c068f
+      note: Trying to fix github actions
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: b4be22ca1b23d44331e3e0a6ccca32a02f5460f3
+      note: Update github workflows
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 67abf0f22d736c3bf0ff96f93bc9e528386047e9
+      note: Update github workflows
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: a62b54f6df3c03879216c6662ba1a0eb77b9a9c5
+      note: Update github workflows
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: bb515ad49cdf31bfeef6354a1355b89fc0fb56fa
+      note: Changelog
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
 - semver: 0.0.5
   date: 2024-08-03T18:35:52-07:00
   packager: Zander Hill <zander@xargs.io>

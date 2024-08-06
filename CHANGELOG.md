@@ -1,4 +1,30 @@
 
+0.1.0
+=============
+2024-08-06
+
+* 0.1.0 release (6f154c33)
+* 0.1.0-rc5 (cd1ca051)
+* Update documentation (c0b23a0a)
+* Add convenience arg in the completion to simplify use in bash (e8178e83)
+* Inject TOME_COMPLETION json value that can be read in child script for completion decisions (6b294c86)
+* 0.1.0-rc4 (4878735f)
+* 0.1.0-rc3 (bc0c0dfd)
+* fix goreleaser argument (8921fb21)
+* 0.1.0-rc2 (d52092d1)
+* 0.1.0-rc1 (d16abd18)
+* Enforce sorted orders in tests (20456503)
+* Fix PATH on ci (060e5b92)
+* Add hermit... to help github actions (72d39ced)
+* Add hermit... to help github actions (434aa8f8)
+* Trying to fix github actions (09b81b7b)
+* Trying to fix github actions (2db47226)
+* Trying to fix github actions (8336fa01)
+* Update github workflows (b4be22ca)
+* Update github workflows (67abf0f2)
+* Update github workflows (a62b54f6)
+* Changelog (bb515ad4)
+
 0.0.5
 =============
 2024-08-04
