@@ -18,7 +18,8 @@ type ScriptTemplate struct {
 	Root            string
 }
 
-//go:embed tome-wrapper.sh.tmpl
+//go:embed embeds/tome-wrapper.sh.tmpl
+//go:embed embeds/.tomeignore
 var content embed.FS
 
 var writePath string
@@ -52,7 +53,7 @@ Read the template script 'tome-wrapper.sh.tmpl' for more information on how the 
 			ExecutableAlias: config.ExecutableName(),
 			Root:            config.RootDir(),
 		}
-		t, err := template.ParseFS(content, "tome-wrapper.sh.tmpl")
+		t, err := template.ParseFS(content, "embeds/tome-wrapper.sh.tmpl")
 		// Capture any error
 		if err != nil {
 			log.Fatalln(err)

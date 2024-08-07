@@ -138,7 +138,7 @@ func NewConfig() *Config {
 }
 
 func (c *Config) IgnorePatterns() *gitignore.GitIgnore {
-	tomeIgnore := ".tome_ignore"
+	tomeIgnore := ".tomeignore"
 	tomeIgnorePath := filepath.Join(c.RootDir(), tomeIgnore)
 	_, err := os.Stat(tomeIgnorePath)
 	if err == nil {
