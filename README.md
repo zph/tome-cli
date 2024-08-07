@@ -45,7 +45,7 @@ See [docs](./docs/tome-cli.md) for expanded instructions
   - root folder's folder names
   - root folder's scripts
   - root script's flags and arguments (when they satisfy the --complete and TOME_COMPLETION interface)
-- Gitignore like syntax for ignoring scripts by using a `.tome_ignore` file at base of root folder
+- Gitignore like syntax for ignoring scripts by using a `.tomeignore` file at base of root folder
 
 # Capabilities
 
