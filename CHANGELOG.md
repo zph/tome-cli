@@ -1,4 +1,12 @@
 
+0.1.1
+=============
+2024-08-07
+
+* v0.1.1 (cdf69d6a)
+* Switch to using .tomeignore file (#3) (271fb234)
+* Update changelog (2578b776)
+
 0.1.0
 =============
 2024-08-06

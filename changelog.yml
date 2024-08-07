@@ -1,3 +1,36 @@
+- semver: 0.1.1
+  date: 2024-08-07T06:20:17-07:00
+  packager: Zander Hill <zander@xargs.io>
+  changes:
+    - commit: cdf69d6aa8ffe5174d30012a0af9a4250919d64f
+      note: v0.1.1
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 271fb234564247ffa174f6be9e6b30aeb7c2fbe3
+      note: |-
+        Switch to using .tomeignore file (#3)
+
+        * Switch to using .tomeignore file
+
+        * Include a .tomeignore file in repo
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: GitHub
+        email: noreply@github.com
+    - commit: 2578b77662f6961364d6c3a79a02a5192b251d78
+      note: Update changelog
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
 - semver: 0.1.0
   date: 2024-08-05T20:02:51-07:00
   packager: Zander Hill <zander@xargs.io>
