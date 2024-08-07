@@ -13,6 +13,7 @@ import (
 )
 
 var UsageKey = "USAGE: "
+var LegacyUsageKey = "SUMMARY: "
 
 // helpCmd represents the help command
 var helpCmd = &cobra.Command{
