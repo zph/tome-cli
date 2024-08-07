@@ -152,6 +152,9 @@ func ValidArgsFunctionForScripts(cmd *cobra.Command, args []string, toComplete s
 
 	var executableOrDirectories []string
 	for _, entry := range toCompleteEntries {
+		if ignorePatterns.MatchesPath(entry) {
+			continue
+		}
 		if strings.HasSuffix(entry, "/") {
 			executableOrDirectories = append(executableOrDirectories, entry)
 		} else {
