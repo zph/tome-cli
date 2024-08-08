@@ -54,11 +54,11 @@ func (s *Script) parse() error {
 		return err
 	}
 
-	if strings.Contains(string(b), UsageKey) {
+	if strings.Contains(string(b), UsageKey) || strings.Contains(string(b), LegacyUsageKey) {
 		lines := strings.Split(string(b), "\n")
 		var linesStart int
 		for idx, line := range lines {
-			if strings.Contains(line, UsageKey) {
+			if strings.Contains(line, UsageKey) || strings.Contains(line, LegacyUsageKey) {
 				linesStart = idx
 				break
 			}
@@ -74,7 +74,7 @@ func (s *Script) parse() error {
 		helpTextLines := lines[linesStart:helpEnds]
 		helpText := strings.Join(helpTextLines, "\n")
 
-		s.usage = strings.TrimSpace(strings.Split(lines[linesStart], UsageKey)[1])
+		s.usage = strings.TrimSpace(strings.SplitN(lines[linesStart], ":", 2)[1])
 		s.help = helpText
 	}
 	return nil
