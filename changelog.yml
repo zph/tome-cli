@@ -1,3 +1,39 @@
+- semver: 0.1.2
+  date: 2024-08-08T08:48:17-07:00
+  packager: Zander Hill <zander@xargs.io>
+  changes:
+    - commit: 131d91dd1a812057e8425730404f41df5864b76a
+      note: 0.1.2
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: a44fe7dd1ca45ca3dce22fc1c52995cee02cf3c9
+      note: 'Respect SUMMARY: or USAGE: (#5)'
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: GitHub
+        email: noreply@github.com
+    - commit: 14fc1b88836a595de099f04717429f6f7bd182f0
+      note: Ensure tomeignore works during completions (#4)
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: GitHub
+        email: noreply@github.com
+    - commit: 2f85cd54b7db8d5fe4ac0c5bc64e2844ebe4885d
+      note: v0.1.1 release
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
 - semver: 0.1.1
   date: 2024-08-07T06:20:17-07:00
   packager: Zander Hill <zander@xargs.io>
@@ -363,6 +399,10 @@
       committer:
         name: Zander Hill
         email: zander@xargs.io
+- semver: 0.0.1
+  date: 2024-08-03T09:17:08-07:00
+  packager: Zander Hill <zander@xargs.io>
+  changes:
     - commit: 40d37218726b1bd967dd1a719ec0307df2ece5fc
       note: Inject TOME_ROOT and TOME_EXECUTABLE into context of scripts
       author:

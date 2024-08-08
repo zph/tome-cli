@@ -1,4 +1,13 @@
 
+0.1.2
+=============
+2024-08-08
+
+* 0.1.2 (131d91dd)
+* Respect SUMMARY: or USAGE: (#5) (a44fe7dd)
+* Ensure tomeignore works during completions (#4) (14fc1b88)
+* v0.1.1 release (2f85cd54)
+
 0.1.1
 =============
 2024-08-07
@@ -70,6 +79,11 @@
 2024-08-03
 
 * Add changelog (b64a4d1b)
+
+0.0.1
+=============
+2024-08-03
+
 * Inject TOME_ROOT and TOME_EXECUTABLE into context of scripts (40d37218)
 * Enable script arguments auto completion (6663f167)
 * Update README (b5a64ad1)
