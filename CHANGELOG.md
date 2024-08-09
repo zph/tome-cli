@@ -1,4 +1,13 @@
 
+0.1.3
+=============
+2024-08-09
+
+* 0.1.3 release (e42a6265)
+* Update comments (6a45090b)
+* Speed improvements on parsing usage and help (#10) (28bbc8fd)
+* Bump changelog (f3c300fc)
+
 0.1.2
 =============
 2024-08-08
@@ -79,11 +88,6 @@
 2024-08-03
 
 * Add changelog (b64a4d1b)
-
-0.0.1
-=============
-2024-08-03
-
 * Inject TOME_ROOT and TOME_EXECUTABLE into context of scripts (40d37218)
 * Enable script arguments auto completion (6663f167)
 * Update README (b5a64ad1)

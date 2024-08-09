@@ -1,3 +1,43 @@
+- semver: 0.1.3
+  date: 2024-08-08T23:38:28-07:00
+  packager: Zander Hill <zander@xargs.io>
+  changes:
+    - commit: e42a6265df80f399716fe2873c478d5f3b995128
+      note: 0.1.3 release
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 6a45090b90df2ad7c6838a4252cbbdddda35a5f1
+      note: Update comments
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 28bbc8fd1f9c571d8087ead1b724dadcd38de7f6
+      note: |-
+        Speed improvements on parsing usage and help (#10)
+
+        Iterative line by line parsing with early exit
+        to extract usage and help information.
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: GitHub
+        email: noreply@github.com
+    - commit: f3c300fce9de15c7cbaa1b7026280b8b51a88b79
+      note: Bump changelog
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
 - semver: 0.1.2
   date: 2024-08-08T08:48:17-07:00
   packager: Zander Hill <zander@xargs.io>
@@ -399,10 +439,6 @@
       committer:
         name: Zander Hill
         email: zander@xargs.io
-- semver: 0.0.1
-  date: 2024-08-03T09:17:08-07:00
-  packager: Zander Hill <zander@xargs.io>
-  changes:
     - commit: 40d37218726b1bd967dd1a719ec0307df2ece5fc
       note: Inject TOME_ROOT and TOME_EXECUTABLE into context of scripts
       author:
