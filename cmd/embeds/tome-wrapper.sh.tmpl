@@ -27,7 +27,8 @@ export TOME_CLI_ROOT="{{ .Root }}"
 # Compatibility layer with former tome executable
 # from https://github.com/zph/tome or upstream
 if [[ -z "${1:-}" ]]; then
-  exec_cmd "tome-cli"
+  # Backwards compatibility with tome means print all script help
+  exec_cmd "tome-cli" help
 fi
 readonly cmd="$1"
 case "$cmd" in
