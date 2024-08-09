@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -48,35 +49,91 @@ func (s *Script) IsExecutable() bool {
 	return isExecutableByOwner(fileInfo.Mode())
 }
 
+// ParseV2 returns the usage and help text for the script
+// function aims to return early and perform as little work as possible
+// to avoid reading the entire file and stay performant
+// with large script folders and files
+func (s *Script) ParseV2() (string, string, error) {
+	log.Debugw("Parsing script", "path", s.path)
+	file, err := os.Open(s.path)
+	if err != nil {
+		return "", "", err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+
+	// Parse the script file for the usage and help text
+	// Expected structure is:
+	// #!/bin/bash
+	// # USAGE: script.sh [options] <arg1> <arg2>
+	// # This is the help text for the script
+	// # It can span multiple lines
+	//
+	// echo 1
+
+	var usage, help string
+	idx := 0
+
+	var helpArr []string
+
+	startsWithComment := regexp.MustCompile(`^[/*\-#]+`)
+	for scanner.Scan() {
+		t := scanner.Text()
+		log.Debugw("Parsing line", "line", t)
+		// Skip the shebang line
+		if idx == 0 && strings.HasPrefix(t, "#!") {
+			log.Debugw("shebang", "line", t)
+			idx++
+			continue
+		}
+		// Normally this is the usage line
+		if idx == 1 {
+			log.Debugw("likely usage", "line", t)
+			if !startsWithComment.MatchString(t) {
+				usage = ""
+				help = ""
+				break
+			} else {
+				withoutCommentChars := strings.TrimLeft(t, "#/-*")
+				regexes := []regexp.Regexp{
+					*regexp.MustCompile(`(USAGE|SUMMARY):`),
+					*regexp.MustCompile(fmt.Sprintf(`(%s|%s)`, regexp.QuoteMeta(`$0`), regexp.QuoteMeta(filepath.Base(s.path)))),
+					*regexp.MustCompile(`TOME_[A-Z_]+`), // ignore tome option flags
+				}
+				for _, r := range regexes {
+					withoutCommentChars = r.ReplaceAllLiteralString(withoutCommentChars, "")
+				}
+				usage = strings.TrimSpace(withoutCommentChars)
+				log.Debugw("usage", "usage", usage)
+				idx++
+			}
+		}
+
+		// Scan until we find an empty line
+		if startsWithComment.MatchString(t) {
+			t2 := strings.TrimSpace(strings.TrimLeft(t, "#/-*"))
+			log.Debugw("help line", "line", t2)
+			helpArr = append(helpArr, t2)
+			idx++
+			continue
+		} else {
+			break
+		}
+	}
+	help = strings.Join(helpArr, "\n")
+
+	return usage, help, nil
+}
+
 func (s *Script) parse() error {
-	b, err := os.ReadFile(s.path)
+	usage, help, err := s.ParseV2()
 	if err != nil {
 		return err
 	}
+	s.usage = usage
+	s.help = help
 
-	if strings.Contains(string(b), UsageKey) || strings.Contains(string(b), LegacyUsageKey) {
-		lines := strings.Split(string(b), "\n")
-		var linesStart int
-		for idx, line := range lines {
-			if strings.Contains(line, UsageKey) || strings.Contains(line, LegacyUsageKey) {
-				linesStart = idx
-				break
-			}
-		}
-
-		var helpEnds int
-		for idx, line := range lines[linesStart:] {
-			if line == "" {
-				helpEnds = idx + linesStart
-				break
-			}
-		}
-		helpTextLines := lines[linesStart:helpEnds]
-		helpText := strings.Join(helpTextLines, "\n")
-
-		s.usage = strings.TrimSpace(strings.SplitN(lines[linesStart], ":", 2)[1])
-		s.help = helpText
-	}
 	return nil
 }
 
@@ -84,24 +141,11 @@ func (s *Script) parse() error {
 // after stripping out the script name or $0
 // this is done to reduce visual noise
 func (s *Script) Usage() string {
-	baseUsage := s.usage
-	prefixes := []string{"$0", filepath.Base(s.path)}
-	for _, prefix := range prefixes {
-		baseUsage = strings.TrimPrefix(baseUsage, prefix)
-	}
-	baseUsage = strings.TrimSpace(baseUsage)
-	return dedent.Dedent(baseUsage)
+	return dedent.Dedent(s.usage)
 }
 
 func (s *Script) Help() string {
-	lines := strings.Split(s.help, "\n")
-	var helpTextLines []string
-	toTrim := []string{"#", "//", "/\\*", "\\*/", "--"}
-	toTrimRegex := regexp.MustCompile(fmt.Sprintf("^(%s)+", strings.Join(toTrim, "|")))
-	for _, line := range lines {
-		helpTextLines = append(helpTextLines, toTrimRegex.ReplaceAllString(line, ""))
-	}
-	return dedent.Dedent(strings.Join(helpTextLines, "\n"))
+	return dedent.Dedent(s.help)
 }
 
 func (s *Script) PathWithoutRoot() string {
