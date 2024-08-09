@@ -53,6 +53,10 @@ func (s *Script) IsExecutable() bool {
 // function aims to return early and perform as little work as possible
 // to avoid reading the entire file and stay performant
 // with large script folders and files
+// Further improvement can be had by detaching the
+// parsing of the usage from the parsing of help
+// This would benefit the case of rendering help and completions
+// where the usage is needed but the help is not
 func (s *Script) ParseV2() (string, string, error) {
 	log.Debugw("Parsing script", "path", s.path)
 	file, err := os.Open(s.path)
