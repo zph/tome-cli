@@ -6,7 +6,6 @@ package cmd
 import (
 	"bytes"
 	"embed"
-	"log"
 	"os"
 	"text/template"
 
@@ -56,7 +55,7 @@ Read the template script 'tome-wrapper.sh.tmpl' for more information on how the 
 		t, err := template.ParseFS(content, "embeds/tome-wrapper.sh.tmpl")
 		// Capture any error
 		if err != nil {
-			log.Fatalln(err)
+			log.Fatal(err)
 		}
 		buf := new(bytes.Buffer)
 		v, err := cmd.Flags().GetString("output")

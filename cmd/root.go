@@ -11,6 +11,7 @@ import (
 	"github.com/gobeam/stringy"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"go.uber.org/zap"
 )
 
 var rootDir string
@@ -64,9 +65,11 @@ func init() {
 	viper.SetDefault("license", "mit")
 }
 
+var log *zap.SugaredLogger
+
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	log := createLogger("initConfig", rootCmd.OutOrStderr())
+	log = createLogger("initConfig", rootCmd.OutOrStderr())
 	v := viper.GetViper()
 	var err error
 	rootDir, err = filepath.Abs(rootDir)
