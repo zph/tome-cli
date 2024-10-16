@@ -73,3 +73,13 @@ case "$cmd" in
 esac
 # Call tome-cli with the provided arguments
 exec_cmd "tome-cli" "$@"
+
+case "$cmd" in
+  # __* is for internal completion commands
+  exec|init|complete|help|alias|--help|__*)
+    exec_cmd "tome-cli" "$@"
+    ;;
+  *)
+    exec_cmd "tome-cli" -- "$@"
+    ;;
+esac
