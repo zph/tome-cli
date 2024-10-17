@@ -74,6 +74,10 @@ See [docs](./docs/tome-cli.md) for expanded instructions
 - [ ] See if there's utility in ActiveHelp https://umarcor.github.io/cobra/#active-help
 - [ ] pre-hooks (hooks.d folder will be sourced in order or executed before the real script)
   - [ ] https://umarcor.github.io/cobra/#prerun-and-postrun-hooks
+- [ ] Help
+  - Help on a directory should print the shorthand outputs of all subcommands in that folder tree
+  - Suppress the builtins from final tab output if we have 1+ matches against directory (bash and
+      fish at least have defective output)
 ```
 	// The *Run functions are executed in the following order:
 	//   * PersistentPreRun()
