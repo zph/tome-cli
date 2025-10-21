@@ -9,19 +9,16 @@ A rewrite of [`sub`](https://github.com/qrush/sub) and [`tome`](https://github.c
 # Usage
 
 ```
-# shorthand syntax via bash wrapper script
-tome-cli --executable kit alias --output ~/bin/kit
+# one time setup command
+# requires setting the --root and --executable name
+# it outputs a templated wrapper script that will be how you call tome-cli
+# in this case it's called `kit` and the scripts repo is ~/example-scripts-folder
+tome-cli --root ~/example-scripts-folder --executable kit alias --output ~/bin/kit
 
 # further uses of kit script have embedded values for TOME_ROOT and TOME_EXECUTABLE
 kit completion fish | source
 kit path to file
 kit pat<TAB>
-
-# Long form
-export TOME_ROOT=examples
-tome-cli exec path to file
-tome-cli help path to <TAB>
-tome-cli completion fish | source
 
 # Setup tab completion
 tome-cli completion fish | source
