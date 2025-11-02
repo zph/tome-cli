@@ -80,8 +80,44 @@ func ExecRunE(cmd *cobra.Command, args []string) error {
 	envs = append(envs, fmt.Sprintf("%s_ROOT=%s", executableAsEnvPrefix, absRootDir))
 	envs = append(envs, fmt.Sprintf("%s_EXECUTABLE=%s", executableAsEnvPrefix, config.ExecutableName()))
 
-	args = append([]string{maybeFile}, maybeArgs...)
-	execOrLog(maybeFile, args, envs)
+	// Check for hooks and generate wrapper if needed
+	var execTarget string
+	var execArgs []string
+
+	if !skipHooks {
+		hookRunner := NewHookRunner(config)
+		hooks, err := hookRunner.DiscoverHooks()
+		if err != nil {
+			fmt.Printf("Error discovering hooks: %v\n", err)
+			os.Exit(1)
+		}
+
+		if len(hooks) > 0 {
+			// Generate wrapper script
+			wrapperPath, err := hookRunner.GenerateWrapperScript(hooks, executable, maybeArgs)
+			if err != nil {
+				fmt.Printf("Error generating wrapper script: %v\n", err)
+				os.Exit(1)
+			}
+
+			// Clean up wrapper on exit (best effort)
+			defer os.Remove(wrapperPath)
+
+			// Execute wrapper instead of script directly
+			execTarget = wrapperPath
+			execArgs = []string{wrapperPath}
+		} else {
+			// No hooks, execute script directly
+			execTarget = executable
+			execArgs = append([]string{executable}, maybeArgs...)
+		}
+	} else {
+		// Skip hooks, execute script directly
+		execTarget = executable
+		execArgs = append([]string{executable}, maybeArgs...)
+	}
+
+	execOrLog(execTarget, execArgs, envs)
 	return nil
 }
 
@@ -128,9 +164,12 @@ var execCmd = &cobra.Command{
 }
 
 var dryRun bool
+var skipHooks bool
 
 func init() {
 	execCmd.Flags().BoolVar(&dryRun, "dry-run", false, "Dry run the exec command")
+	execCmd.Flags().BoolVar(&skipHooks, "skip-hooks", false, "Skip pre-execution hooks")
 	viper.BindPFlag("dry-run", execCmd.Flags().Lookup("dry-run"))
+	viper.BindPFlag("skip-hooks", execCmd.Flags().Lookup("skip-hooks"))
 	rootCmd.AddCommand(execCmd)
 }

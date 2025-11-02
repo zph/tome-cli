@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# USAGE: test-hooks
+# Script to verify hooks executed correctly
+
+# Check if hook set the environment variable
+if [ "$HOOK_SET_VAR" = "value_from_hook" ]; then
+    echo "SUCCESS: Sourced hook set environment variable"
+else
+    echo "FAIL: HOOK_SET_VAR not set by sourced hook"
+    exit 1
+fi
+
+# Verify hook execution file exists
+if [ -f /tmp/tome-hook-test.txt ]; then
+    echo "SUCCESS: Hooks executed and created marker file"
+    cat /tmp/tome-hook-test.txt
+else
+    echo "FAIL: Hook marker file not found"
+    exit 1
+fi
+
+# Clean up
+rm -f /tmp/tome-hook-test.txt
+
+echo "All hooks tests passed!"
+exit 0
