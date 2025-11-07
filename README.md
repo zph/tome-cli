@@ -176,6 +176,26 @@ case $1 in
 esac
 ```
 
+### Pre-Run Hooks
+
+Execute custom scripts before your main scripts run. Perfect for:
+- Environment validation and setup
+- Dependency checking
+- Authentication checks
+- Audit logging
+
+Create a `.hooks.d/` directory in your scripts root and add numbered hooks:
+
+```bash
+# Executable hook - runs as separate process
+.hooks.d/00-check-deps
+
+# Sourced hook - runs in same shell, can modify environment
+.hooks.d/05-set-env.source
+```
+
+See [docs/hooks.md](./docs/hooks.md) for complete guide with examples.
+
 ### Flexible Root Detection
 
 tome-cli determines the scripts root directory from multiple sources (in order of precedence):
@@ -200,10 +220,10 @@ This flexibility allows team members to customize locations without changing the
 - ✅ Environment variable injection
 - ✅ Structured logging with levels
 - ✅ Generated documentation
+- ✅ Pre-run hooks (.hooks.d folder execution)
 
 ### Planned
 - ⏳ ActiveHelp integration for contextual assistance
-- ⏳ Pre/post hooks (hooks.d folder execution)
 - ⏳ Enhanced directory help (show all subcommands in tree)
 - ⏳ Improved completion output filtering
 
@@ -318,6 +338,7 @@ Make sure:
 - [Your First Script](#your-first-script) - Create your first script
 - [Writing Scripts Guide](./docs/writing-scripts.md) - Comprehensive guide to writing scripts
 - [Completion Guide](./docs/completion-guide.md) - Implement custom tab completions
+- [Pre-Run Hooks Guide](./docs/hooks.md) - Add validation and setup hooks
 - [Migration Guide](./docs/migration.md) - Migrate from original tome/sub
 
 ### Core Documentation

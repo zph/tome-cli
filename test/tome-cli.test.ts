@@ -44,6 +44,7 @@ for await (let [executable, fn] of [["tome-cli", tome], ["wrapper.sh", wrapper]]
       "folder bar: <arg1> <arg2>",
       "folder test-env-injection: ",
       "foo: <arg1> <arg2>",
+      "test-hooks:",
     ]);
   });
 
@@ -114,3 +115,51 @@ Deno.test(`tome-cli: TOME_COMPLETION passed through as env`, async function (t):
     'TOME_COMPLETION={"args":["folder","test-env-injection"],"last_arg":"test-env-injection","current_word":"a"}',
   ].sort());
 })
+
+// Hooks tests
+for await (let [executable, fn] of [["tome-cli", tome], ["wrapper.sh", wrapper]]) {
+  executable = executable as string
+  fn = fn as () => any
+
+  Deno.test(`${executable}: hooks execute before script`, async function (t): Promise<void> {
+    // Clean up any previous test runs
+    try {
+      await Deno.remove("/tmp/tome-hook-test.txt");
+    } catch {
+      // Ignore if file doesn't exist
+    }
+
+    const { code, lines } = await fn(`exec test-hooks`);
+    assertEquals(code, 0);
+
+    // Verify the test script passed (which means hooks ran successfully)
+    assertStringIncludes(lines.join("\n"), "SUCCESS: Sourced hook set environment variable");
+    assertStringIncludes(lines.join("\n"), "SUCCESS: Hooks executed and created marker file");
+    assertStringIncludes(lines.join("\n"), "All hooks tests passed!");
+  });
+
+  Deno.test(`${executable}: --skip-hooks flag skips hooks`, async function (t): Promise<void> {
+    // Clean up any previous test runs
+    try {
+      await Deno.remove("/tmp/tome-hook-test.txt");
+    } catch {
+      // Ignore if file doesn't exist
+    }
+
+    // Run with --skip-hooks - the test-hooks script should fail because
+    // HOOK_SET_VAR won't be set (sourced hook didn't run)
+    const { code } = await fn(`exec --skip-hooks test-hooks`);
+
+    // Script should exit with non-zero because hook-set variable is missing
+    assertEquals(code, 1);
+
+    // Verify marker file wasn't created (hooks didn't run)
+    let fileExists = true;
+    try {
+      await Deno.stat("/tmp/tome-hook-test.txt");
+    } catch {
+      fileExists = false;
+    }
+    assertEquals(fileExists, false, "Hook marker file should not exist when hooks are skipped");
+  });
+}
