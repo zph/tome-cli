@@ -6,6 +6,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
 	"strings"
@@ -93,19 +94,23 @@ func ExecRunE(cmd *cobra.Command, args []string) error {
 		}
 
 		if len(hooks) > 0 {
-			// Generate wrapper script
-			wrapperPath, err := hookRunner.GenerateWrapperScript(hooks, executable, maybeArgs)
+			// Generate wrapper script content
+			wrapperContent, err := hookRunner.GenerateWrapperScriptContent(hooks, executable, maybeArgs)
 			if err != nil {
 				fmt.Printf("Error generating wrapper script: %v\n", err)
 				os.Exit(1)
 			}
 
-			// Clean up wrapper on exit (best effort)
-			defer os.Remove(wrapperPath)
-
-			// Execute wrapper instead of script directly
-			execTarget = wrapperPath
-			execArgs = []string{wrapperPath}
+			// Execute shell with inline script instead of script directly
+			shellPath, err := findShell()
+			if err != nil {
+				fmt.Printf("Error finding shell: %v\n", err)
+				os.Exit(1)
+			}
+			execTarget = shellPath
+			// Use basename of shell path for argv[0]
+			shellName := filepath.Base(shellPath)
+			execArgs = []string{shellName, "-c", wrapperContent}
 		} else {
 			// No hooks, execute script directly
 			execTarget = executable
@@ -119,6 +124,22 @@ func ExecRunE(cmd *cobra.Command, args []string) error {
 
 	execOrLog(execTarget, execArgs, envs)
 	return nil
+}
+
+// findShell locates a POSIX shell, preferring bash but falling back to sh if unavailable
+func findShell() (string, error) {
+	// Try bash first
+	if bashPath, err := exec.LookPath("bash"); err == nil {
+		return bashPath, nil
+	}
+
+	// Fall back to sh (POSIX standard)
+	if shPath, err := exec.LookPath("sh"); err == nil {
+		log.Debugw("bash not found, using sh as fallback", "path", shPath)
+		return shPath, nil
+	}
+
+	return "", fmt.Errorf("neither bash nor sh found")
 }
 
 func execOrLog(arv0 string, argv []string, env []string) {

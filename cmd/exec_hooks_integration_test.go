@@ -97,20 +97,12 @@ exit 0
 			t.Error("Hook should be marked as sourced")
 		}
 
-		wrapperPath, err := hookRunner.GenerateWrapperScript(hooks, scriptPath, []string{})
+		wrapperContent, err := hookRunner.GenerateWrapperScriptContent(hooks, scriptPath, []string{})
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer os.Remove(wrapperPath)
-
 		// Verify wrapper contains source command
-		content, err := os.ReadFile(wrapperPath)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		contentStr := string(content)
-		if !strings.Contains(contentStr, "source "+hookPath) {
+		if !strings.Contains(wrapperContent, "source "+hookPath) {
 			t.Error("Wrapper should contain source command for .source hook")
 		}
 	})
@@ -274,25 +266,17 @@ exit 0
 
 		// Generate wrapper with args
 		args := []string{"arg1", "arg2", "arg3"}
-		wrapperPath, err := hookRunner.GenerateWrapperScript(hooks, scriptPath, args)
+		wrapperContent, err := hookRunner.GenerateWrapperScriptContent(hooks, scriptPath, args)
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer os.Remove(wrapperPath)
-
 		// Verify wrapper contains args
-		content, err := os.ReadFile(wrapperPath)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		contentStr := string(content)
-		if !strings.Contains(contentStr, "exec "+scriptPath+" arg1 arg2 arg3") {
+		if !strings.Contains(wrapperContent,"exec "+scriptPath+" arg1 arg2 arg3") {
 			t.Error("Wrapper should contain script path and arguments")
 		}
 
 		// Verify environment variable is set
-		if !strings.Contains(contentStr, `TOME_SCRIPT_ARGS="arg1 arg2 arg3"`) {
+		if !strings.Contains(wrapperContent,`TOME_SCRIPT_ARGS="arg1 arg2 arg3"`) {
 			t.Error("Wrapper should set TOME_SCRIPT_ARGS with all arguments")
 		}
 	})

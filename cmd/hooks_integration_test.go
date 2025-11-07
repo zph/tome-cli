@@ -8,6 +8,18 @@ import (
 	"testing"
 )
 
+// executeWrapperContent executes wrapper script content using bash -c
+func executeWrapperContent(content string) ([]byte, error) {
+	cmd := exec.Command("bash", "-c", content)
+	return cmd.CombinedOutput()
+}
+
+// executeWrapperContentWithSh executes wrapper script content using sh -c
+func executeWrapperContentWithSh(content string) ([]byte, error) {
+	cmd := exec.Command("sh", "-c", content)
+	return cmd.CombinedOutput()
+}
+
 // TestHookExecution tests end-to-end hook execution
 func TestHookExecution(t *testing.T) {
 	t.Run("executable hook runs successfully", func(t *testing.T) {
@@ -46,15 +58,13 @@ exit 0
 			t.Fatal(err)
 		}
 
-		wrapperPath, err := hr.GenerateWrapperScript(hooks, scriptPath, []string{})
+		wrapperContent, err := hr.GenerateWrapperScriptContent(hooks, scriptPath, []string{})
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer os.Remove(wrapperPath)
 
 		// Execute wrapper
-		cmd := exec.Command(wrapperPath)
-		output, err := cmd.CombinedOutput()
+		output, err := executeWrapperContent(wrapperContent)
 		if err != nil {
 			t.Fatalf("Wrapper execution failed: %v, output: %s", err, output)
 		}
@@ -110,15 +120,13 @@ exit 0
 			t.Fatal(err)
 		}
 
-		wrapperPath, err := hr.GenerateWrapperScript(hooks, scriptPath, []string{})
+		wrapperContent, err := hr.GenerateWrapperScriptContent(hooks, scriptPath, []string{})
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer os.Remove(wrapperPath)
 
 		// Execute wrapper
-		cmd := exec.Command(wrapperPath)
-		output, err := cmd.CombinedOutput()
+		output, err := executeWrapperContent(wrapperContent)
 		if err != nil {
 			t.Fatalf("Wrapper execution failed: %v, output: %s", err, output)
 		}
@@ -174,15 +182,13 @@ exit 0
 			t.Fatal(err)
 		}
 
-		wrapperPath, err := hr.GenerateWrapperScript(hooks, scriptPath, []string{})
+		wrapperContent, err := hr.GenerateWrapperScriptContent(hooks, scriptPath, []string{})
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer os.Remove(wrapperPath)
 
 		// Execute wrapper - should fail
-		cmd := exec.Command(wrapperPath)
-		output, err := cmd.CombinedOutput()
+		output, err := executeWrapperContent(wrapperContent)
 		if err == nil {
 			t.Fatal("Expected wrapper to fail due to hook failure")
 		}
@@ -248,15 +254,12 @@ exit 0
 			t.Fatal(err)
 		}
 
-		wrapperPath, err := hr.GenerateWrapperScript(discoveredHooks, scriptPath, []string{})
+		wrapperContent, err := hr.GenerateWrapperScriptContent(discoveredHooks, scriptPath, []string{})
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer os.Remove(wrapperPath)
-
 		// Execute wrapper
-		cmd := exec.Command(wrapperPath)
-		output, err := cmd.CombinedOutput()
+		output, err := executeWrapperContent(wrapperContent)
 		if err != nil {
 			t.Fatalf("Wrapper execution failed: %v, output: %s", err, output)
 		}
@@ -326,15 +329,13 @@ exit 0
 			t.Fatal(err)
 		}
 
-		wrapperPath, err := hr.GenerateWrapperScript(hooks, scriptPath, []string{})
+		wrapperContent, err := hr.GenerateWrapperScriptContent(hooks, scriptPath, []string{})
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer os.Remove(wrapperPath)
 
 		// Execute wrapper
-		cmd := exec.Command(wrapperPath)
-		output, err := cmd.CombinedOutput()
+		output, err := executeWrapperContent(wrapperContent)
 		if err != nil {
 			t.Fatalf("Wrapper execution failed: %v, output: %s", err, output)
 		}
@@ -396,15 +397,12 @@ exit 0
 			t.Fatal(err)
 		}
 
-		wrapperPath, err := hr.GenerateWrapperScript(hooks, scriptPath, []string{"arg1", "arg2"})
+		wrapperContent, err := hr.GenerateWrapperScriptContent(hooks, scriptPath, []string{"arg1", "arg2"})
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer os.Remove(wrapperPath)
-
 		// Execute wrapper
-		cmd := exec.Command(wrapperPath)
-		output, err := cmd.CombinedOutput()
+		output, err := executeWrapperContent(wrapperContent)
 		if err != nil {
 			t.Fatalf("Wrapper execution failed: %v, output: %s", err, output)
 		}
@@ -468,15 +466,13 @@ exit 0
 			t.Fatal(err)
 		}
 
-		wrapperPath, err := hr.GenerateWrapperScript(hooks, scriptPath, []string{})
+		wrapperContent, err := hr.GenerateWrapperScriptContent(hooks, scriptPath, []string{})
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer os.Remove(wrapperPath)
 
 		// Execute wrapper - should fail
-		cmd := exec.Command(wrapperPath)
-		_, err = cmd.CombinedOutput()
+		_, err = executeWrapperContent(wrapperContent)
 		if err == nil {
 			t.Fatal("Expected wrapper to fail due to sourced hook failure")
 		}
@@ -484,6 +480,162 @@ exit 0
 		// Verify script did not execute
 		if _, err := os.Stat(outputFile); err == nil {
 			t.Error("Script should not have executed after sourced hook failure")
+		}
+	})
+}
+
+// TestShellCompatibility tests that wrapper scripts work with sh, not just bash
+func TestShellCompatibility(t *testing.T) {
+	t.Run("wrapper script executes with sh", func(t *testing.T) {
+		tmpDir := t.TempDir()
+		hooksDir := filepath.Join(tmpDir, ".hooks.d")
+		if err := os.Mkdir(hooksDir, 0755); err != nil {
+			t.Fatal(err)
+		}
+
+		// Create a simple POSIX-compliant hook
+		outputFile := filepath.Join(tmpDir, "hook-output.txt")
+		hookContent := `#!/bin/sh
+echo "hook executed" > ` + outputFile + `
+exit 0
+`
+		hookPath := filepath.Join(hooksDir, "00-test-hook")
+		if err := os.WriteFile(hookPath, []byte(hookContent), 0755); err != nil {
+			t.Fatal(err)
+		}
+
+		// Create target script
+		scriptOutput := filepath.Join(tmpDir, "script-output.txt")
+		scriptContent := `#!/bin/sh
+echo "script executed" > ` + scriptOutput + `
+exit 0
+`
+		scriptPath := filepath.Join(tmpDir, "test-script")
+		if err := os.WriteFile(scriptPath, []byte(scriptContent), 0755); err != nil {
+			t.Fatal(err)
+		}
+
+		// Generate wrapper and execute with sh
+		config := setupTestConfig(t, tmpDir, "tome-cli")
+		hr := NewHookRunner(config)
+		hooks, err := hr.DiscoverHooks()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		wrapperContent, err := hr.GenerateWrapperScriptContent(hooks, scriptPath, []string{})
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		// Execute with sh explicitly
+		output, err := executeWrapperContentWithSh(wrapperContent)
+		if err != nil {
+			t.Fatalf("Wrapper execution with sh failed: %v, output: %s", err, output)
+		}
+
+		// Verify hook executed
+		if _, err := os.Stat(outputFile); os.IsNotExist(err) {
+			t.Error("Hook did not execute")
+		}
+
+		// Verify script executed
+		if _, err := os.Stat(scriptOutput); os.IsNotExist(err) {
+			t.Error("Script did not execute")
+		}
+	})
+
+	t.Run("sourced hook works with sh", func(t *testing.T) {
+		tmpDir := t.TempDir()
+		hooksDir := filepath.Join(tmpDir, ".hooks.d")
+		if err := os.Mkdir(hooksDir, 0755); err != nil {
+			t.Fatal(err)
+		}
+
+		// Create sourced hook with POSIX syntax
+		hookContent := `# POSIX-compliant environment setup
+TEST_VAR="from_hook"
+export TEST_VAR
+`
+		hookPath := filepath.Join(hooksDir, "05-env.source")
+		if err := os.WriteFile(hookPath, []byte(hookContent), 0644); err != nil {
+			t.Fatal(err)
+		}
+
+		// Create script that checks the variable
+		outputFile := filepath.Join(tmpDir, "output.txt")
+		scriptContent := `#!/bin/sh
+echo "TEST_VAR=$TEST_VAR" > ` + outputFile + `
+exit 0
+`
+		scriptPath := filepath.Join(tmpDir, "test-script")
+		if err := os.WriteFile(scriptPath, []byte(scriptContent), 0755); err != nil {
+			t.Fatal(err)
+		}
+
+		// Generate and execute with sh
+		config := setupTestConfig(t, tmpDir, "tome-cli")
+		hr := NewHookRunner(config)
+		hooks, err := hr.DiscoverHooks()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		wrapperContent, err := hr.GenerateWrapperScriptContent(hooks, scriptPath, []string{})
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		output, err := executeWrapperContentWithSh(wrapperContent)
+		if err != nil {
+			t.Fatalf("Wrapper execution with sh failed: %v, output: %s", err, output)
+		}
+
+		// Verify variable was set
+		content, err := os.ReadFile(outputFile)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if !strings.Contains(string(content), "TEST_VAR=from_hook") {
+			t.Errorf("Variable not set correctly. Got: %s", content)
+		}
+	})
+
+	t.Run("wrapper uses POSIX-compliant syntax", func(t *testing.T) {
+		tmpDir := t.TempDir()
+		config := setupTestConfig(t, tmpDir, "tome-cli")
+		hr := NewHookRunner(config)
+
+		// Create minimal hooks with tmpDir-based path
+		hookPath := filepath.Join(tmpDir, "hook1")
+		hooks := []Hook{
+			{
+				Path:    hookPath,
+				Name:    "00-hook1",
+				Sourced: false,
+			},
+		}
+
+		wrapperContent, err := hr.GenerateWrapperScriptContent(hooks, "/fake/script", []string{"arg1", "arg2"})
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		// Verify wrapper doesn't use bash-specific features
+		// Check it uses 'set -e' which is POSIX
+		if !strings.Contains(wrapperContent, "set -e") {
+			t.Error("Wrapper should use POSIX 'set -e'")
+		}
+
+		// Verify it doesn't use bash-specific features like [[
+		if strings.Contains(wrapperContent, "[[") {
+			t.Error("Wrapper should not use bash-specific [[ syntax")
+		}
+
+		// Verify exec command is POSIX
+		if !strings.Contains(wrapperContent, "exec /fake/script") {
+			t.Error("Wrapper should use POSIX exec")
 		}
 	})
 }
@@ -540,14 +692,13 @@ exit 0
 			t.Fatal(err)
 		}
 
-		wrapperPath, err := hr.GenerateWrapperScript(hooks, scriptPath, []string{})
+		wrapperContent, err := hr.GenerateWrapperScriptContent(hooks, scriptPath, []string{})
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer os.Remove(wrapperPath)
 
 		// Execute with REQUIRED_VAR set
-		cmd := exec.Command(wrapperPath)
+		cmd := exec.Command("bash", "-c", wrapperContent)
 		cmd.Env = append(os.Environ(), "REQUIRED_VAR=test_value")
 		output, err := cmd.CombinedOutput()
 		if err != nil {
@@ -609,15 +760,12 @@ exit 0
 			t.Fatal(err)
 		}
 
-		wrapperPath, err := hr.GenerateWrapperScript(hooks, scriptPath, []string{"--env", "production"})
+		wrapperContent, err := hr.GenerateWrapperScriptContent(hooks, scriptPath, []string{"--env", "production"})
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer os.Remove(wrapperPath)
-
 		// Execute wrapper
-		cmd := exec.Command(wrapperPath)
-		output, err := cmd.CombinedOutput()
+		output, err := executeWrapperContent(wrapperContent)
 		if err != nil {
 			t.Fatalf("Wrapper execution failed: %v, output: %s", err, output)
 		}

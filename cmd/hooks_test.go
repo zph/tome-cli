@@ -269,19 +269,19 @@ func TestHookDiscovery(t *testing.T) {
 	})
 }
 
-// TestGenerateWrapperScript tests the wrapper script generation
-func TestGenerateWrapperScript(t *testing.T) {
-	t.Run("no hooks returns empty path", func(t *testing.T) {
+// TestGenerateWrapperScriptContent tests the wrapper script generation
+func TestGenerateWrapperScriptContent(t *testing.T) {
+	t.Run("no hooks returns empty content", func(t *testing.T) {
 		tmpDir := t.TempDir()
 		config := setupTestConfig(t, tmpDir, "tome-cli")
 		hr := NewHookRunner(config)
 
-		wrapperPath, err := hr.GenerateWrapperScript([]Hook{}, "/fake/script", []string{})
+		content, err := hr.GenerateWrapperScriptContent([]Hook{}, "/fake/script", []string{})
 		if err != nil {
-			t.Errorf("GenerateWrapperScript() returned error: %v", err)
+			t.Errorf("GenerateWrapperScriptContent() returned error: %v", err)
 		}
-		if wrapperPath != "" {
-			t.Errorf("GenerateWrapperScript() expected empty path for no hooks, got '%s'", wrapperPath)
+		if content != "" {
+			t.Errorf("GenerateWrapperScriptContent() expected empty content for no hooks, got '%s'", content)
 		}
 	})
 
@@ -290,45 +290,29 @@ func TestGenerateWrapperScript(t *testing.T) {
 		config := setupTestConfig(t, tmpDir, "tome-cli")
 		hr := NewHookRunner(config)
 
+		hookPath := filepath.Join(tmpDir, "00-test")
 		hooks := []Hook{
 			{
-				Path:    "/tmp/hooks/00-test",
+				Path:    hookPath,
 				Name:    "00-test",
 				Sourced: false,
 			},
 		}
 
-		wrapperPath, err := hr.GenerateWrapperScript(hooks, "/fake/script", []string{"arg1", "arg2"})
+		content, err := hr.GenerateWrapperScriptContent(hooks, "/fake/script", []string{"arg1", "arg2"})
 		if err != nil {
-			t.Errorf("GenerateWrapperScript() returned error: %v", err)
+			t.Errorf("GenerateWrapperScriptContent() returned error: %v", err)
 		}
-		if wrapperPath == "" {
-			t.Fatal("GenerateWrapperScript() returned empty path")
-		}
-		defer os.Remove(wrapperPath)
-
-		// Verify wrapper file exists
-		if _, err := os.Stat(wrapperPath); os.IsNotExist(err) {
-			t.Error("GenerateWrapperScript() did not create wrapper file")
+		if content == "" {
+			t.Fatal("GenerateWrapperScriptContent() returned empty content")
 		}
 
-		// Read and verify content
-		content, err := os.ReadFile(wrapperPath)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		contentStr := string(content)
-		// Check for shebang
-		if len(contentStr) == 0 || contentStr[0:2] != "#!" {
-			t.Error("Wrapper script missing shebang")
-		}
-		// Check for hook execution
-		if !contains(contentStr, "/tmp/hooks/00-test") {
+		// Check for hook execution (now quoted)
+		if !contains(content, `"`+hookPath+`"`) {
 			t.Error("Wrapper script missing hook execution")
 		}
-		// Check for target script exec
-		if !contains(contentStr, "exec /fake/script arg1 arg2") {
+		// Check for target script exec (shellescape only quotes when necessary)
+		if !contains(content, `exec "/fake/script" arg1 arg2`) {
 			t.Error("Wrapper script missing target script exec")
 		}
 	})
@@ -338,32 +322,26 @@ func TestGenerateWrapperScript(t *testing.T) {
 		config := setupTestConfig(t, tmpDir, "tome-cli")
 		hr := NewHookRunner(config)
 
+		hookPath := filepath.Join(tmpDir, "05-env.source")
 		hooks := []Hook{
 			{
-				Path:    "/tmp/hooks/05-env.source",
+				Path:    hookPath,
 				Name:    "05-env.source",
 				Sourced: true,
 			},
 		}
 
-		wrapperPath, err := hr.GenerateWrapperScript(hooks, "/fake/script", []string{})
+		content, err := hr.GenerateWrapperScriptContent(hooks, "/fake/script", []string{})
 		if err != nil {
-			t.Errorf("GenerateWrapperScript() returned error: %v", err)
+			t.Errorf("GenerateWrapperScriptContent() returned error: %v", err)
 		}
-		if wrapperPath == "" {
-			t.Fatal("GenerateWrapperScript() returned empty path")
-		}
-		defer os.Remove(wrapperPath)
-
-		// Read and verify content
-		content, err := os.ReadFile(wrapperPath)
-		if err != nil {
-			t.Fatal(err)
+		if content == "" {
+			t.Fatal("GenerateWrapperScriptContent() returned empty content")
 		}
 
-		contentStr := string(content)
-		// Check for source command
-		if !contains(contentStr, "source /tmp/hooks/05-env.source") {
+		contentStr := content
+		// Check for source command (now quoted)
+		if !contains(contentStr, `source "`+hookPath+`"`) {
 			t.Error("Wrapper script missing source command for .source hook")
 		}
 	})
@@ -373,30 +351,24 @@ func TestGenerateWrapperScript(t *testing.T) {
 		config := setupTestConfig(t, tmpDir, "tome-cli")
 		hr := NewHookRunner(config)
 
+		hookPath := filepath.Join(tmpDir, "00-test")
 		hooks := []Hook{
 			{
-				Path:    "/tmp/hooks/00-test",
+				Path:    hookPath,
 				Name:    "00-test",
 				Sourced: false,
 			},
 		}
 
-		wrapperPath, err := hr.GenerateWrapperScript(hooks, "/fake/script", []string{"arg1"})
+		content, err := hr.GenerateWrapperScriptContent(hooks, "/fake/script", []string{"arg1"})
 		if err != nil {
-			t.Errorf("GenerateWrapperScript() returned error: %v", err)
+			t.Errorf("GenerateWrapperScriptContent() returned error: %v", err)
 		}
-		if wrapperPath == "" {
-			t.Fatal("GenerateWrapperScript() returned empty path")
-		}
-		defer os.Remove(wrapperPath)
-
-		// Read and verify content
-		content, err := os.ReadFile(wrapperPath)
-		if err != nil {
-			t.Fatal(err)
+		if content == "" {
+			t.Fatal("GenerateWrapperScriptContent() returned empty content")
 		}
 
-		contentStr := string(content)
+		contentStr := content
 		// Check for environment variables
 		if !contains(contentStr, "TOME_ROOT=") {
 			t.Error("Wrapper script missing TOME_ROOT")
@@ -420,31 +392,29 @@ func TestGenerateWrapperScript(t *testing.T) {
 		config := setupTestConfig(t, tmpDir, "tome-cli")
 		hr := NewHookRunner(config)
 
+		hookPath := filepath.Join(tmpDir, "00-test")
 		hooks := []Hook{
 			{
-				Path:    "/tmp/hooks/00-test",
+				Path:    hookPath,
 				Name:    "00-test",
 				Sourced: false,
 			},
 		}
 
-		wrapperPath, err := hr.GenerateWrapperScript(hooks, "/fake/script", []string{})
+		content, err := hr.GenerateWrapperScriptContent(hooks, "/fake/script", []string{})
 		if err != nil {
-			t.Errorf("GenerateWrapperScript() returned error: %v", err)
+			t.Errorf("GenerateWrapperScriptContent() returned error: %v", err)
 		}
-		if wrapperPath == "" {
-			t.Fatal("GenerateWrapperScript() returned empty path")
-		}
-		defer os.Remove(wrapperPath)
-
-		// Check file is executable
-		fileInfo, err := os.Stat(wrapperPath)
-		if err != nil {
-			t.Fatal(err)
+		if content == "" {
+			t.Fatal("GenerateWrapperScriptContent() returned empty content")
 		}
 
-		if !isExecutableByOwner(fileInfo.Mode()) {
-			t.Error("Wrapper script is not executable")
+		// Verify content is valid shell script with expected structure
+		if !contains(content, "set -e") {
+			t.Error("Wrapper script missing 'set -e' directive")
+		}
+		if !contains(content, `exec "/fake/script"`) {
+			t.Error("Wrapper script missing exec command for target script")
 		}
 	})
 
@@ -453,48 +423,45 @@ func TestGenerateWrapperScript(t *testing.T) {
 		config := setupTestConfig(t, tmpDir, "tome-cli")
 		hr := NewHookRunner(config)
 
+		hook1Path := filepath.Join(tmpDir, "00-first")
+		hook2Path := filepath.Join(tmpDir, "05-env.source")
+		hook3Path := filepath.Join(tmpDir, "10-second")
+
 		hooks := []Hook{
 			{
-				Path:    "/tmp/hooks/00-first",
+				Path:    hook1Path,
 				Name:    "00-first",
 				Sourced: false,
 			},
 			{
-				Path:    "/tmp/hooks/05-env.source",
+				Path:    hook2Path,
 				Name:    "05-env.source",
 				Sourced: true,
 			},
 			{
-				Path:    "/tmp/hooks/10-second",
+				Path:    hook3Path,
 				Name:    "10-second",
 				Sourced: false,
 			},
 		}
 
-		wrapperPath, err := hr.GenerateWrapperScript(hooks, "/fake/script", []string{})
+		content, err := hr.GenerateWrapperScriptContent(hooks, "/fake/script", []string{})
 		if err != nil {
-			t.Errorf("GenerateWrapperScript() returned error: %v", err)
+			t.Errorf("GenerateWrapperScriptContent() returned error: %v", err)
 		}
-		if wrapperPath == "" {
-			t.Fatal("GenerateWrapperScript() returned empty path")
-		}
-		defer os.Remove(wrapperPath)
-
-		// Read and verify content
-		content, err := os.ReadFile(wrapperPath)
-		if err != nil {
-			t.Fatal(err)
+		if content == "" {
+			t.Fatal("GenerateWrapperScriptContent() returned empty content")
 		}
 
-		contentStr := string(content)
-		// Verify all hooks are present
-		if !contains(contentStr, "/tmp/hooks/00-first") {
+		contentStr := content
+		// Verify all hooks are present (now with quotes)
+		if !contains(contentStr, `"`+hook1Path+`"`) {
 			t.Error("Wrapper script missing first hook")
 		}
-		if !contains(contentStr, "source /tmp/hooks/05-env.source") {
+		if !contains(contentStr, `source "`+hook2Path+`"`) {
 			t.Error("Wrapper script missing sourced hook")
 		}
-		if !contains(contentStr, "/tmp/hooks/10-second") {
+		if !contains(contentStr, `"`+hook3Path+`"`) {
 			t.Error("Wrapper script missing second hook")
 		}
 
@@ -508,6 +475,54 @@ func TestGenerateWrapperScript(t *testing.T) {
 		}
 		if firstIdx > secondIdx || secondIdx > thirdIdx {
 			t.Error("Hooks not in correct order")
+		}
+	})
+
+	t.Run("wrapper handles paths with spaces", func(t *testing.T) {
+		tmpDir := t.TempDir()
+		config := setupTestConfig(t, tmpDir, "tome-cli")
+		hr := NewHookRunner(config)
+
+		// Create hook and script paths with spaces
+		hookPath := filepath.Join(tmpDir, "hook with spaces")
+		scriptPath := filepath.Join(tmpDir, "script with spaces.sh")
+
+		hooks := []Hook{
+			{
+				Path:    hookPath,
+				Name:    "hook with spaces",
+				Sourced: false,
+			},
+		}
+
+		args := []string{"arg with spaces", "normal-arg", "another arg"}
+		content, err := hr.GenerateWrapperScriptContent(hooks, scriptPath, args)
+		if err != nil {
+			t.Errorf("GenerateWrapperScriptContent() returned error: %v", err)
+		}
+		if content == "" {
+			t.Fatal("GenerateWrapperScriptContent() returned empty content")
+		}
+
+		// Verify hook path is quoted
+		if !contains(content, `"`+hookPath+`"`) {
+			t.Error("Wrapper script missing quoted hook path")
+		}
+
+		// Verify script path is quoted
+		if !contains(content, `"`+scriptPath+`"`) {
+			t.Error("Wrapper script missing quoted script path")
+		}
+
+		// Verify args with spaces are quoted but normal args are not
+		if !contains(content, `'arg with spaces'`) {
+			t.Error("Wrapper script missing quoted argument with spaces")
+		}
+		if !contains(content, `normal-arg`) {
+			t.Error("Wrapper script missing unquoted simple argument")
+		}
+		if !contains(content, `'another arg'`) {
+			t.Error("Wrapper script missing second quoted argument with spaces")
 		}
 	})
 }
