@@ -1,3 +1,163 @@
+- semver: 0.2.0
+  date: 2025-12-10T14:08:54-05:00
+  packager: Zander Hill <zander@xargs.io>
+  changes:
+    - commit: 714063191f82dce7fb93e30da878e5af5bab559e
+      note: Bump version file to v0.2.0
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: bb4f689ced40203b0de448d0bacf7a01971b3700
+      note: |-
+        [Prototype] Implement pre-run hooks with .hooks.d support (#15)
+
+        * Implement pre-run hooks with .hooks.d support
+
+        Add pre-run hooks feature that executes scripts before main script execution.
+        Hooks enable environment validation, dependency checking, authentication, and setup tasks.
+
+        Implementation:
+        - Hook discovery from .hooks.d directory with lexicographic ordering
+        - Two hook types: executable (separate process) and sourced (same shell context)
+        - Sourced hooks use .source suffix and can modify environment variables
+        - Wrapper script generation for proper execution flow
+        - --skip-hooks flag to bypass hook execution
+        - Full environment variable injection (TOME_ROOT, TOME_SCRIPT_PATH, etc.)
+
+        Tests:
+        - 38 total tests covering unit, integration, and E2E scenarios
+        - Comprehensive validation of hook discovery, execution, and environment handling
+        - Deno E2E tests verify real-world usage with both tome-cli and wrapper
+
+        Documentation:
+        - Complete user guide in docs/hooks.md with examples and use cases
+        - Updated README.md with hooks feature section
+        - Example hooks in examples/.hooks.d for reference
+
+        All tests passing. Feature ready for use.
+
+        * Refactor hooks implementation with proper quoting and improved portability
+
+        This commit improves the hooks system with better shell compatibility,
+        proper argument escaping, and cleaner code organization.
+
+        Changes:
+
+        * Rename findBash() to findShell() and simplify implementation
+          - Better name reflects that it finds bash OR sh
+          - Remove hardcoded path checks for bash and sh
+          - Use exec.LookPath("bash") with fallback to exec.LookPath("sh")
+          - Use actual shell name (bash/sh) as argv[0] instead of hardcoding
+          - More portable and idiomatic Go code
+
+        * Add proper shell escaping for paths and arguments
+          - Integrate al.essio.dev/pkg/shellescape library
+          - Quote all hook paths, script paths in wrapper template
+          - Quote arguments only when necessary (e.g., spaces, special chars)
+          - Prevents command injection and handles edge cases correctly
+
+        * Fix hardcoded /tmp paths in tests
+          - Replace all hardcoded /tmp paths with t.TempDir()
+          - Ensures proper test isolation and cross-platform compatibility
+          - Updated: hooks_test.go, hooks_integration_test.go
+
+        * Add comprehensive sh compatibility tests
+          - New TestShellCompatibility suite with 3 test cases
+          - Verify wrapper scripts execute correctly with sh (not just bash)
+          - Test sourced hooks work with sh
+          - Validate POSIX-compliant syntax (no bash-specific features)
+          - Add executeWrapperContentWithSh() helper function
+
+        * Add test for paths with spaces
+          - Verify proper quoting of paths containing spaces
+          - Test that simple args remain unquoted while complex args are quoted
+          - Ensures robustness with real-world path scenarios
+
+        All tests passing:
+        - Unit tests: 9 test suites
+        - Integration tests: including new sh compatibility tests
+        - E2E tests: 25/25
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: GitHub
+        email: noreply@github.com
+    - commit: b5d315d515d4f9632ffee9bc50d30097b549c010
+      note: |-
+        Update README and add comprehensive documentation guides
+
+        README improvements:
+        - Add Quick Start section with direct usage and alias options
+        - Add "Your First Script" section with working example
+        - Document environment variables (TOME_ROOT, TOME_EXECUTABLE, etc.)
+        - Add Troubleshooting section for common issues
+        - Reorganize Features section and add Table of Contents
+
+        New docs:
+        - docs/writing-scripts.md: Guide for writing scripts in multiple languages,
+          explains USAGE vs SUMMARY (both work identically), environment variables,
+          organization patterns, and best practices
+        - docs/completion-guide.md: How to implement script-level completions with
+          examples in bash, python, typescript, ruby, and advanced patterns
+        - docs/migration.md: Migration guide from original tome/sub with checklist
+          and troubleshooting
+
+        Clarifies that USAGE and SUMMARY are interchangeable keywords (both
+        supported for backward compatibility). Adds practical examples based on
+        storage-cli usage patterns.
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 248059fc38c56e0f45e251347985fcc3e519e624
+      note: Update README.md
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: GitHub
+        email: noreply@github.com
+    - commit: 590825f00454d7c59c73f447ad52e2ee8d14d77a
+      note: Add notes on improvements in README
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 5cae95a2e8b74d4d59f2a79c6e5f0cb4e12d88b3
+      note: Update wrapper script to handle additional edge cases
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
+    - commit: 32918d5f9dcc01cf4f9473c974cffaf6af9837f9
+      note: |-
+        Zero args to the wrapper means call help (#11)
+
+        Closes #8
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: GitHub
+        email: noreply@github.com
+    - commit: 7b3c373e6756474013bc27e9d17ab9bed201f278
+      note: 0.1.3 release
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
 - semver: 0.1.3
   date: 2024-08-08T23:38:28-07:00
   packager: Zander Hill <zander@xargs.io>
@@ -439,6 +599,10 @@
       committer:
         name: Zander Hill
         email: zander@xargs.io
+- semver: 0.0.1
+  date: 2024-08-03T09:17:08-07:00
+  packager: Zander Hill <zander@xargs.io>
+  changes:
     - commit: 40d37218726b1bd967dd1a719ec0307df2ece5fc
       note: Inject TOME_ROOT and TOME_EXECUTABLE into context of scripts
       author:
