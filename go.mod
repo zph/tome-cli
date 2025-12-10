@@ -3,6 +3,7 @@ module github.com/zph/tome-cli
 go 1.22.2
 
 require (
+	al.essio.dev/pkg/shellescape v1.6.0
 	github.com/gobeam/stringy v0.0.7
 	github.com/lithammer/dedent v1.1.0
 	github.com/sabhiram/go-gitignore v0.0.0-20210923224102-525f6e181f06

@@ -6,6 +6,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
 	"strings"
@@ -80,9 +81,65 @@ func ExecRunE(cmd *cobra.Command, args []string) error {
 	envs = append(envs, fmt.Sprintf("%s_ROOT=%s", executableAsEnvPrefix, absRootDir))
 	envs = append(envs, fmt.Sprintf("%s_EXECUTABLE=%s", executableAsEnvPrefix, config.ExecutableName()))
 
-	args = append([]string{maybeFile}, maybeArgs...)
-	execOrLog(maybeFile, args, envs)
+	// Check for hooks and generate wrapper if needed
+	var execTarget string
+	var execArgs []string
+
+	if !skipHooks {
+		hookRunner := NewHookRunner(config)
+		hooks, err := hookRunner.DiscoverHooks()
+		if err != nil {
+			fmt.Printf("Error discovering hooks: %v\n", err)
+			os.Exit(1)
+		}
+
+		if len(hooks) > 0 {
+			// Generate wrapper script content
+			wrapperContent, err := hookRunner.GenerateWrapperScriptContent(hooks, executable, maybeArgs)
+			if err != nil {
+				fmt.Printf("Error generating wrapper script: %v\n", err)
+				os.Exit(1)
+			}
+
+			// Execute shell with inline script instead of script directly
+			shellPath, err := findShell()
+			if err != nil {
+				fmt.Printf("Error finding shell: %v\n", err)
+				os.Exit(1)
+			}
+			execTarget = shellPath
+			// Use basename of shell path for argv[0]
+			shellName := filepath.Base(shellPath)
+			execArgs = []string{shellName, "-c", wrapperContent}
+		} else {
+			// No hooks, execute script directly
+			execTarget = executable
+			execArgs = append([]string{executable}, maybeArgs...)
+		}
+	} else {
+		// Skip hooks, execute script directly
+		execTarget = executable
+		execArgs = append([]string{executable}, maybeArgs...)
+	}
+
+	execOrLog(execTarget, execArgs, envs)
 	return nil
+}
+
+// findShell locates a POSIX shell, preferring bash but falling back to sh if unavailable
+func findShell() (string, error) {
+	// Try bash first
+	if bashPath, err := exec.LookPath("bash"); err == nil {
+		return bashPath, nil
+	}
+
+	// Fall back to sh (POSIX standard)
+	if shPath, err := exec.LookPath("sh"); err == nil {
+		log.Debugw("bash not found, using sh as fallback", "path", shPath)
+		return shPath, nil
+	}
+
+	return "", fmt.Errorf("neither bash nor sh found")
 }
 
 func execOrLog(arv0 string, argv []string, env []string) {
@@ -128,9 +185,12 @@ var execCmd = &cobra.Command{
 }
 
 var dryRun bool
+var skipHooks bool
 
 func init() {
 	execCmd.Flags().BoolVar(&dryRun, "dry-run", false, "Dry run the exec command")
+	execCmd.Flags().BoolVar(&skipHooks, "skip-hooks", false, "Skip pre-execution hooks")
 	viper.BindPFlag("dry-run", execCmd.Flags().Lookup("dry-run"))
+	viper.BindPFlag("skip-hooks", execCmd.Flags().Lookup("skip-hooks"))
 	rootCmd.AddCommand(execCmd)
 }

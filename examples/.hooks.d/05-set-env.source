@@ -1,0 +1,8 @@
+# Sourced hook that sets environment variables
+# This file is sourced, so no shebang or execute permission needed
+
+export HOOK_SET_VAR="value_from_hook"
+export ANOTHER_VAR="another_value"
+
+# Write marker to verify sourcing worked
+echo "sourced hook executed" >> /tmp/tome-hook-test.txt

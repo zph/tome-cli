@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Test hook that validates environment and writes to a file
+
+# Write execution marker
+echo "hook executed" >> /tmp/tome-hook-test.txt
+
+# Validate tome environment variables are set
+if [ -z "$TOME_ROOT" ]; then
+    echo "Error: TOME_ROOT not set" >&2
+    exit 1
+fi
+
+if [ -z "$TOME_EXECUTABLE" ]; then
+    echo "Error: TOME_EXECUTABLE not set" >&2
+    exit 1
+fi
+
+# Write env to file for test verification
+echo "TOME_ROOT=$TOME_ROOT" >> /tmp/tome-hook-test.txt
+echo "TOME_SCRIPT_NAME=$TOME_SCRIPT_NAME" >> /tmp/tome-hook-test.txt
+
+exit 0
