@@ -1,4 +1,18 @@
 
+0.2.0
+=============
+2025-12-10
+
+* Update changelog for v0.2.0 (cf9e626c)
+* Bump version file to v0.2.0 (71406319)
+* [Prototype] Implement pre-run hooks with .hooks.d support (#15) (bb4f689c)
+* Update README and add comprehensive documentation guides (b5d315d5)
+* Update README.md (248059fc)
+* Add notes on improvements in README (590825f0)
+* Update wrapper script to handle additional edge cases (5cae95a2)
+* Zero args to the wrapper means call help (#11) (32918d5f)
+* 0.1.3 release (7b3c373e)
+
 0.1.3
 =============
 2024-08-09
@@ -88,6 +102,11 @@
 2024-08-03
 
 * Add changelog (b64a4d1b)
+
+0.0.1
+=============
+2024-08-03
+
 * Inject TOME_ROOT and TOME_EXECUTABLE into context of scripts (40d37218)
 * Enable script arguments auto completion (6663f167)
 * Update README (b5a64ad1)

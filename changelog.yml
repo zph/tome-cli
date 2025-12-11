@@ -1,7 +1,15 @@
 - semver: 0.2.0
-  date: 2025-12-10T14:08:54-05:00
+  date: 2025-12-10T14:09:45-05:00
   packager: Zander Hill <zander@xargs.io>
   changes:
+    - commit: cf9e626ca61141cce8164054efc6a045251fd69d
+      note: Update changelog for v0.2.0
+      author:
+        name: Zander Hill
+        email: zander@xargs.io
+      committer:
+        name: Zander Hill
+        email: zander@xargs.io
     - commit: 714063191f82dce7fb93e30da878e5af5bab559e
       note: Bump version file to v0.2.0
       author:
