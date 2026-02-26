@@ -5,10 +5,12 @@ package cmd
 
 import (
 	"io/fs"
+	"os"
 	"path"
 	"path/filepath"
 
 	"github.com/lithammer/dedent"
+	gitignore "github.com/sabhiram/go-gitignore"
 	"github.com/spf13/cobra"
 )
 
@@ -45,21 +47,7 @@ var helpCmd = &cobra.Command{
 		rootDir := config.RootDir()
 		ignorePatterns := config.IgnorePatterns()
 		if len(args) == 0 {
-			allExecutables := []string{}
-			fn := func(path string, info fs.FileInfo, err error) error {
-				if err != nil {
-					return err
-				}
-				if info.IsDir() {
-					return nil
-				}
-				if isExecutableByOwner(info.Mode()) && !ignorePatterns.MatchesPath(path) {
-					allExecutables = append(allExecutables, path)
-				}
-				return nil
-			}
-			// TODO: does not handle symlinks, consider fb symlinkWalk instead
-			err := filepath.Walk(rootDir, fn)
+			allExecutables, err := collectExecutables(rootDir, ignorePatterns)
 			if err != nil {
 				return err
 			}
@@ -76,6 +64,37 @@ var helpCmd = &cobra.Command{
 		return nil
 	},
 	ValidArgsFunction: ValidArgsFunctionForScripts,
+}
+
+// collectExecutables walks rootDir and returns paths to all executable files,
+// resolving symlinks to check the target's properties.
+// SYMLINK-001, SYMLINK-002: symlinked executables are included.
+// SYMLINK-003: broken symlinks are skipped without error.
+func collectExecutables(rootDir string, ignorePatterns *gitignore.GitIgnore) ([]string, error) {
+	var allExecutables []string
+	fn := func(p string, info fs.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		// SYMLINK-001, SYMLINK-002: resolve symlinks to check target properties
+		if info.Mode()&os.ModeSymlink != 0 {
+			resolved, statErr := os.Stat(p)
+			if statErr != nil {
+				// SYMLINK-003: skip broken symlinks
+				return nil
+			}
+			info = resolved
+		}
+		if info.IsDir() {
+			return nil
+		}
+		if isExecutableByOwner(info.Mode()) && !ignorePatterns.MatchesPath(p) {
+			allExecutables = append(allExecutables, p)
+		}
+		return nil
+	}
+	err := filepath.Walk(rootDir, fn)
+	return allExecutables, err
 }
 
 func init() {

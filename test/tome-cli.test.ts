@@ -38,12 +38,14 @@ for await (let [executable, fn] of [["tome-cli", tome], ["wrapper.sh", wrapper]]
     await assertSnapshot(t, out);
   });
 
+  // SYMLINK-001: symlinked-foo SHALL appear in help listing
   Deno.test(`top level help`, async function (t): Promise<void> {
     const { lines } = await fn("help");
     assertEquals(lines, [
       "folder bar: <arg1> <arg2>",
       "folder test-env-injection: ",
       "foo: <arg1> <arg2>",
+      "symlinked-foo: <arg1> <arg2>",
       "test-hooks:",
     ]);
   });
@@ -96,6 +98,27 @@ for await (let [executable, fn] of [["tome-cli", tome], ["wrapper.sh", wrapper]]
       ":4",
       "Completion ended with directive: ShellCompDirectiveNoFileComp",
     ]);
+  });
+
+  // SYMLINK-004: exec SHALL execute a symlinked script
+  Deno.test(`${executable}: exec runs symlinked script`, async function (t): Promise<void> {
+    const { code, lines } = await fn(`exec symlinked-foo`);
+    assertEquals(code, 0);
+    assertEquals(lines[0], "1");
+  });
+
+  // SYMLINK-005: help SHALL display usage for a symlinked script
+  Deno.test(`${executable}: help shows symlinked script usage`, async function (t): Promise<void> {
+    const { code, out } = await fn(`help symlinked-foo`);
+    assertEquals(code, 0);
+    assertStringIncludes(out, "<arg1> <arg2>");
+    assertStringIncludes(out, "This is a foo script");
+  });
+
+  // SYMLINK-006: completion SHALL include symlinked scripts
+  Deno.test(`${executable}: completion includes symlinked scripts`, async function (t): Promise<void> {
+    const { out } = await fn(`__complete exec sym`);
+    assertStringIncludes(out, "symlinked-foo");
   });
 
   Deno.test(`${executable}: injects TOME_ROOT and TOME_EXECUTABLE into environment of script`, async function (t): Promise<void> {
